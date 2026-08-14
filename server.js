@@ -1,5 +1,6 @@
 const express = require("express");
 const db = require("./database");
+const validateEvent = require("./validators/eventValidator");
 
 const app = express();
 
@@ -74,16 +75,12 @@ app.put("/events/:id", (req, res) => {
         capacity
     } = req.body;
 
-    if (!title ||
-        !description ||
-        !category ||
-        !location ||
-        !date ||
-        !time ||
-        !capacity
-    ) {
+    const validationError = validateEvent(req.body);
+
+    if (validationError) {
         return res.status(400).json({
-            message: "All event fields are required"
+            error: "Validation failed",
+            message: validationError
         });
     }
 
@@ -181,16 +178,12 @@ app.post("/events", (req, res) => {
         capacity
     } = req.body;
 
-    if (!title ||
-        !description ||
-        !category ||
-        !location ||
-        !date ||
-        !time ||
-        !capacity
-    ) {
+    const validationError = validateEvent(req.body);
+
+    if (validationError) {
         return res.status(400).json({
-            message: "All event fields are required"
+            error: "Validation failed",
+            message: validationError
         });
     }
 
