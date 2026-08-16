@@ -106,6 +106,89 @@ app.get("/events/:id", (req, res) => {
     );
 
 });
+// Register for an event
+app.post("/events/:id/register", (req, res) => {
+
+    const eventId = Number(req.params.id);
+
+    const {
+        student_name,
+        student_email
+    } = req.body;
+
+    if (!student_name || !student_email) {
+        return res.status(400).json({
+            message: "Student name and email are required"
+        });
+    }
+
+    // Check whether the event exists
+    db.get(
+        "SELECT * FROM events WHERE id = ?", [eventId],
+        (err, event) => {
+
+            if (err) {
+                return res.status(500).json({
+                    error: err.message
+                });
+            }
+
+            if (!event) {
+                return res.status(404).json({
+                    message: "Event not found"
+                });
+            }
+
+            // Check current registration count
+            db.get(
+                "SELECT COUNT(*) AS count FROM registrations WHERE event_id = ?", [eventId],
+                (err, result) => {
+
+                    if (err) {
+                        return res.status(500).json({
+                            error: err.message
+                        });
+                    }
+
+                    if (result.count >= event.capacity) {
+                        return res.status(400).json({
+                            message: "Event is full"
+                        });
+                    }
+
+                    // Save registration
+                    db.run(
+                        `INSERT INTO registrations
+                        (event_id, student_name, student_email)
+                        VALUES (?, ?, ?)`, [eventId, student_name, student_email],
+                        function(err) {
+
+                            if (err) {
+                                return res.status(500).json({
+                                    error: err.message
+                                });
+                            }
+
+                            res.status(201).json({
+                                message: "Registration successful",
+                                registration: {
+                                    id: this.lastID,
+                                    event_id: eventId,
+                                    student_name,
+                                    student_email
+                                }
+                            });
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+});
 // Update an event
 app.put("/events/:id", (req, res) => {
 

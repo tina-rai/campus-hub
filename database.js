@@ -32,5 +32,14 @@ db.run(`
     console.log("Events table ready");
 
 });
-
+db.run(`
+    CREATE TABLE IF NOT EXISTS registrations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        student_name TEXT NOT NULL,
+        student_email TEXT NOT NULL,
+        registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (event_id) REFERENCES events(id)
+    )
+`);
 module.exports = db;
