@@ -100,3 +100,26 @@ body {
 .filters button:hover {
     background: #1768d1;
 }
+
+.event-details p {
+    margin: 15px 0;
+}
+
+.event-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.event-card:hover {
+    transform: translateY(-3px);
+}
+
+.back-button {
+    margin-top: 20px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #2f80ed;
+    color: white;
+    cursor: pointer;
+}

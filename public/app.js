@@ -66,6 +66,10 @@ function displayEvents(events) {
 
         card.className = "event-card";
 
+        card.addEventListener("click", () => {
+            window.location.href = `/event.html?id=${event.id}`;
+        });
+
         card.innerHTML = `
             <span class="event-category">
                 ${event.category}
