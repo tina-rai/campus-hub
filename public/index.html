@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CampusHub</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <header class="header">
+
+        <div class="container">
+
+            <h1>CampusHub</h1>
+
+            <p>
+                Discover what's happening on campus.
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main class="container">
+        <section class="filters">
+
+            <input type="text" id="search-input" placeholder="Search events...">
+
+            <select id="category-filter">
+                <option value="">All Categories</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Competition">Competition</option>
+                <option value="Seminar">Seminar</option>
+                <option value="Club">Club</option>
+            </select>
+
+            <button id="search-btn">
+                Search
+            </button>
+
+        </section>
+
+        <section class="events-section">
+
+            <h2>Upcoming Events</h2>
+
+            <div id="event-list"></div>
+
+        </section>
+
+    </main>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
