@@ -14,36 +14,52 @@ app.get("/events", (req, res) => {
         search,
         category,
         location,
-        sort
+        sort,
+        page = 1,
+        limit = 5
     } = req.query;
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    if (!Number.isInteger(pageNumber) ||
+        !Number.isInteger(limitNumber) ||
+        pageNumber <= 0 ||
+        limitNumber <= 0
+    ) {
+        return res.status(400).json({
+            message: "Page and limit must be positive integers"
+        });
+    }
+
+    const offset = (pageNumber - 1) * limitNumber;
 
     let sql = "SELECT * FROM events WHERE 1=1";
     const params = [];
 
-    // Search title and description
     if (search) {
         sql += " AND (title LIKE ? OR description LIKE ?)";
         params.push(`%${search}%`, `%${search}%`);
     }
 
-    // Filter by category
     if (category) {
         sql += " AND category = ?";
         params.push(category);
     }
 
-    // Filter by location
     if (location) {
         sql += " AND location = ?";
         params.push(location);
     }
 
-    // Sorting
     if (sort === "latest") {
         sql += " ORDER BY date DESC, time DESC";
     } else {
         sql += " ORDER BY date ASC, time ASC";
     }
+
+    sql += " LIMIT ? OFFSET ?";
+    params.push(limitNumber, offset);
 
     db.all(sql, params, (err, rows) => {
 
@@ -53,7 +69,11 @@ app.get("/events", (req, res) => {
             });
         }
 
-        res.json(rows);
+        res.json({
+            page: pageNumber,
+            limit: limitNumber,
+            results: rows
+        });
 
     });
 
