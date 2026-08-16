@@ -7,30 +7,55 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-
-app.get("/", (req, res) => {
-    res.send("CampusHub API is running");
-});
-app.use(express.static("public"));
-
+//GET
 app.get("/events", (req, res) => {
 
-    db.all(
-        "SELECT * FROM events", [],
-        (err, rows) => {
+    const {
+        search,
+        category,
+        location,
+        sort
+    } = req.query;
 
-            if (err) {
+    let sql = "SELECT * FROM events WHERE 1=1";
+    const params = [];
 
-                return res.status(500).json({
-                    error: err.message
-                });
+    // Search title and description
+    if (search) {
+        sql += " AND (title LIKE ? OR description LIKE ?)";
+        params.push(`%${search}%`, `%${search}%`);
+    }
 
-            }
+    // Filter by category
+    if (category) {
+        sql += " AND category = ?";
+        params.push(category);
+    }
 
-            res.json(rows);
+    // Filter by location
+    if (location) {
+        sql += " AND location = ?";
+        params.push(location);
+    }
 
+    // Sorting
+    if (sort === "latest") {
+        sql += " ORDER BY date DESC, time DESC";
+    } else {
+        sql += " ORDER BY date ASC, time ASC";
+    }
+
+    db.all(sql, params, (err, rows) => {
+
+        if (err) {
+            return res.status(500).json({
+                error: err.message
+            });
         }
-    );
+
+        res.json(rows);
+
+    });
 
 });
 // Get one event
