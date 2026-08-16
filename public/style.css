@@ -123,3 +123,40 @@ body {
     color: white;
     cursor: pointer;
 }
+
+.registration-section {
+    margin-top: 25px;
+}
+
+#registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+#registration-form input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+#registration-form button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #2f80ed;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#registration-form button:hover {
+    background: #1768d1;
+}
+
+#registration-message {
+    margin-top: 15px;
+    font-weight: bold;
+}
