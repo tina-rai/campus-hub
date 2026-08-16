@@ -86,7 +86,7 @@ app.get("/events/:id", (req, res) => {
 
     db.get(
         "SELECT * FROM events WHERE id = ?", [id],
-        (err, row) => {
+        (err, event) => {
 
             if (err) {
                 return res.status(500).json({
@@ -94,13 +94,35 @@ app.get("/events/:id", (req, res) => {
                 });
             }
 
-            if (!row) {
+            if (!event) {
                 return res.status(404).json({
                     message: "Event not found"
                 });
             }
 
-            res.json(row);
+            db.get(
+                `SELECT COUNT(*) AS registered
+                 FROM registrations
+                 WHERE event_id = ?`, [id],
+                (err, result) => {
+
+                    if (err) {
+                        return res.status(500).json({
+                            error: err.message
+                        });
+                    }
+
+                    const registered = result.registered;
+                    const remaining = event.capacity - registered;
+
+                    res.json({
+                        ...event,
+                        registered,
+                        remaining
+                    });
+
+                }
+            );
 
         }
     );
@@ -139,10 +161,11 @@ app.post("/events/:id/register", (req, res) => {
                 });
             }
 
-            // Check current registration count
+            // Check duplicate registration
             db.get(
-                "SELECT COUNT(*) AS count FROM registrations WHERE event_id = ?", [eventId],
-                (err, result) => {
+                `SELECT * FROM registrations
+                 WHERE event_id = ? AND student_email = ?`, [eventId, student_email],
+                (err, registration) => {
 
                     if (err) {
                         return res.status(500).json({
@@ -150,18 +173,18 @@ app.post("/events/:id/register", (req, res) => {
                         });
                     }
 
-                    if (result.count >= event.capacity) {
+                    if (registration) {
                         return res.status(400).json({
-                            message: "Event is full"
+                            message: "You are already registered for this event"
                         });
                     }
 
-                    // Save registration
-                    db.run(
-                        `INSERT INTO registrations
-                        (event_id, student_name, student_email)
-                        VALUES (?, ?, ?)`, [eventId, student_name, student_email],
-                        function(err) {
+                    // Check current registration count
+                    db.get(
+                        `SELECT COUNT(*) AS count
+                         FROM registrations
+                         WHERE event_id = ?`, [eventId],
+                        (err, result) => {
 
                             if (err) {
                                 return res.status(500).json({
@@ -169,15 +192,48 @@ app.post("/events/:id/register", (req, res) => {
                                 });
                             }
 
-                            res.status(201).json({
-                                message: "Registration successful",
-                                registration: {
-                                    id: this.lastID,
-                                    event_id: eventId,
+                            if (result.count >= event.capacity) {
+                                return res.status(400).json({
+                                    message: "Event is full"
+                                });
+                            }
+
+                            // Save registration
+                            db.run(
+                                `INSERT INTO registrations
+                                (event_id, student_name, student_email)
+                                VALUES (?, ?, ?)`, [
+                                    eventId,
                                     student_name,
                                     student_email
+                                ],
+                                function(err) {
+
+                                    if (err) {
+
+                                        if (err.message.includes("UNIQUE constraint failed")) {
+                                            return res.status(400).json({
+                                                message: "You are already registered for this event"
+                                            });
+                                        }
+
+                                        return res.status(500).json({
+                                            error: err.message
+                                        });
+                                    }
+
+                                    res.status(201).json({
+                                        message: "Registration successful",
+                                        registration: {
+                                            id: this.lastID,
+                                            event_id: eventId,
+                                            student_name,
+                                            student_email
+                                        }
+                                    });
+
                                 }
-                            });
+                            );
 
                         }
                     );

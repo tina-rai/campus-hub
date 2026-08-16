@@ -39,7 +39,8 @@ db.run(`
         student_name TEXT NOT NULL,
         student_email TEXT NOT NULL,
         registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (event_id) REFERENCES events(id)
+        FOREIGN KEY (event_id) REFERENCES events(id),
+        UNIQUE(event_id, student_email)
     )
 `);
 module.exports = db;

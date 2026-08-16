@@ -61,9 +61,19 @@ async function loadEvent() {
             </p>
 
             <p>
-                👥 <strong>Capacity:</strong>
-                ${event.capacity}
-            </p>
+    👥 <strong>Capacity:</strong>
+    ${event.capacity}
+</p>
+
+<p>
+    🎟️ <strong>Registered:</strong>
+    ${event.registered}
+</p>
+
+<p>
+    🪑 <strong>Seats remaining:</strong>
+    ${event.remaining}
+</p>
 
             <button
                 class="back-button"
