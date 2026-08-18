@@ -471,7 +471,56 @@ app.get("/events/:id/registrations", (req, res) => {
     );
 
 });
+// Get registrations for a student
+app.get("/registrations", (req, res) => {
 
+    const { email } = req.query;
+
+    if (!email) {
+        return res.status(400).json({
+            message: "Email is required"
+        });
+    }
+
+    const sql = `
+        SELECT
+            registrations.id AS registration_id,
+            registrations.student_name,
+            registrations.student_email,
+            registrations.registered_at,
+            events.id AS event_id,
+            events.title,
+            events.description,
+            events.category,
+            events.location,
+            events.date,
+            events.time
+        FROM registrations
+        JOIN events
+            ON registrations.event_id = events.id
+        WHERE registrations.student_email = ?
+        ORDER BY events.date ASC
+    `;
+
+    db.all(
+        sql, [email],
+        (err, rows) => {
+
+            if (err) {
+                return res.status(500).json({
+                    error: err.message
+                });
+            }
+
+            res.json({
+                count: rows.length,
+                registrations: rows
+            });
+
+        }
+    );
+
+});
 app.listen(PORT, () => {
 
     console.log(
