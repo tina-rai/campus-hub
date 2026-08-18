@@ -160,3 +160,19 @@ body {
     margin-top: 15px;
     font-weight: bold;
 }
+
+.registration-list-section {
+    margin-top: 25px;
+}
+
+.registration-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.registration-card p {
+    margin-top: 5px;
+    color: #666;
+}

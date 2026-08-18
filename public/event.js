@@ -3,6 +3,8 @@ const registrationForm =
 
 const registrationMessage =
     document.getElementById("registration-message");
+const registrationList =
+    document.getElementById("registration-list");
 const eventDetails =
     document.getElementById("event-details");
 
@@ -93,9 +95,6 @@ async function loadEvent() {
     }
 
 }
-
-loadEvent();
-
 async function registerForEvent(eventId) {
 
     const studentName =
@@ -153,6 +152,63 @@ async function registerForEvent(eventId) {
     }
 
 }
+async function loadRegistrations(eventId) {
+
+    try {
+
+        const response =
+            await fetch(`/events/${eventId}/registrations`);
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            registrationList.innerHTML =
+                `<p>${data.message}</p>`;
+            return;
+        }
+
+        if (data.registrations.length === 0) {
+
+            registrationList.innerHTML =
+                "<p>No students registered yet.</p>";
+
+            return;
+        }
+
+        registrationList.innerHTML = "";
+
+        data.registrations.forEach((registration, index) => {
+
+            const student =
+                document.createElement("div");
+
+            student.className = "registration-card";
+
+            student.innerHTML = `
+                <strong>
+                    ${index + 1}. ${registration.student_name}
+                </strong>
+
+                <p>
+                    ${registration.student_email}
+                </p>
+            `;
+
+            registrationList.appendChild(student);
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        registrationList.innerHTML =
+            "<p>Failed to load registrations.</p>";
+
+    }
+
+}
 registrationForm.addEventListener("submit", async(event) => {
 
     event.preventDefault();
@@ -165,3 +221,13 @@ registrationForm.addEventListener("submit", async(event) => {
     await registerForEvent(eventId);
 
 });
+loadEvent();
+
+const params =
+    new URLSearchParams(window.location.search);
+
+const eventId = params.get("id");
+
+if (eventId) {
+    loadRegistrations(eventId);
+}
