@@ -412,6 +412,65 @@ app.post("/events", (req, res) => {
     });
 
 });
+// Get registrations for an event
+app.get("/events/:id/registrations", (req, res) => {
+
+    const eventId = Number(req.params.id);
+
+    if (!Number.isInteger(eventId) || eventId <= 0) {
+        return res.status(400).json({
+            message: "Event ID must be a positive integer"
+        });
+    }
+
+    // First check that the event exists
+    db.get(
+        "SELECT id, title FROM events WHERE id = ?", [eventId],
+        (err, event) => {
+
+            if (err) {
+                return res.status(500).json({
+                    error: err.message
+                });
+            }
+
+            if (!event) {
+                return res.status(404).json({
+                    message: "Event not found"
+                });
+            }
+
+            // Get registrations
+            db.all(
+                `SELECT
+                    id,
+                    student_name,
+                    student_email,
+                    registered_at
+                 FROM registrations
+                 WHERE event_id = ?
+                 ORDER BY registered_at ASC`, [eventId],
+                (err, registrations) => {
+
+                    if (err) {
+                        return res.status(500).json({
+                            error: err.message
+                        });
+                    }
+
+                    res.json({
+                        event: event,
+                        count: registrations.length,
+                        registrations: registrations
+                    });
+
+                }
+            );
+
+        }
+    );
+
+});
 
 app.listen(PORT, () => {
 
