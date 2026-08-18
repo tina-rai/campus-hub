@@ -521,6 +521,41 @@ app.get("/registrations", (req, res) => {
     );
 
 });
+// Cancel a registration
+app.delete("/registrations/:id", (req, res) => {
+
+    const registrationId = Number(req.params.id);
+
+    if (!Number.isInteger(registrationId) || registrationId <= 0) {
+        return res.status(400).json({
+            message: "Registration ID must be a positive integer"
+        });
+    }
+
+    db.run(
+        "DELETE FROM registrations WHERE id = ?", [registrationId],
+        function(err) {
+
+            if (err) {
+                return res.status(500).json({
+                    error: err.message
+                });
+            }
+
+            if (this.changes === 0) {
+                return res.status(404).json({
+                    message: "Registration not found"
+                });
+            }
+
+            res.json({
+                message: "Registration cancelled successfully"
+            });
+
+        }
+    );
+
+});
 app.listen(PORT, () => {
 
     console.log(
