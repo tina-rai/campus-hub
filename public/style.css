@@ -199,3 +199,17 @@ body {
     color: white;
     cursor: pointer;
 }
+
+.cancel-registration-btn {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #d9534f;
+    color: white;
+    cursor: pointer;
+}
+
+.cancel-registration-btn:hover {
+    background: #c9302c;
+}
