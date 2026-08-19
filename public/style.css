@@ -45,22 +45,33 @@ body {
 
 #event-list {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
 }
 
 .event-card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
+    border: 1px solid #e1e5eb;
+    border-radius: 12px;
+    padding: 22px;
+    background: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .event-card h3 {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    font-size: 20px;
 }
 
 .event-card p {
     margin-bottom: 8px;
     color: #555;
+    line-height: 1.5;
 }
 
 .event-category {
@@ -77,6 +88,7 @@ body {
     display: flex;
     gap: 15px;
     margin-bottom: 25px;
+    flex-wrap: wrap;
 }
 
 .filters input,
@@ -102,30 +114,30 @@ body {
 }
 
 .event-details p {
-    margin: 15px 0;
-}
-
-.event-card {
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.event-card:hover {
-    transform: translateY(-3px);
+    margin: 12px 0;
+    color: #555;
+    line-height: 1.6;
 }
 
 .back-button {
     margin-top: 20px;
-    padding: 10px 18px;
+    padding: 11px 18px;
     border: none;
     border-radius: 8px;
     background: #2f80ed;
     color: white;
     cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.back-button:hover {
+    background: #1768d1;
 }
 
 .registration-section {
     margin-top: 25px;
+    border-top: 4px solid #2f80ed;
 }
 
 #registration-form {
@@ -143,17 +155,20 @@ body {
 }
 
 #registration-form button {
-    padding: 12px;
+    padding: 13px;
     border: none;
     border-radius: 8px;
     background: #2f80ed;
     color: white;
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
 }
 
 #registration-form button:hover {
     background: #1768d1;
+    transform: translateY(-1px);
 }
 
 #registration-message {
@@ -166,10 +181,15 @@ body {
 }
 
 .registration-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 10px;
+    border: 1px solid #e1e5eb;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 12px;
+    background: #fafcff;
+}
+
+.registration-card h3 {
+    margin-bottom: 10px;
 }
 
 .registration-card p {
@@ -180,7 +200,8 @@ body {
 #registration-search-form {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
+    margin-top: 20px;
+    margin-bottom: 25px;
 }
 
 #registration-search-form input {
@@ -192,12 +213,19 @@ body {
 }
 
 #registration-search-form button {
-    padding: 12px 20px;
+    padding: 12px 22px;
     border: none;
     border-radius: 8px;
     background: #2f80ed;
     color: white;
     cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+}
+
+#registration-search-form button:hover {
+    background: #1768d1;
+    transform: translateY(-1px);
 }
 
 .cancel-registration-btn {
@@ -229,4 +257,49 @@ body {
 
 .navbar a:hover {
     text-decoration: underline;
+}
+
+.my-registrations-header {
+    margin-bottom: 20px;
+}
+
+#my-registrations {
+    display: grid;
+    gap: 15px;
+}
+
+.registration-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.registration-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 600px) {
+    .header {
+        padding: 30px 0;
+    }
+    .header h1 {
+        font-size: 28px;
+    }
+    .events-section {
+        padding: 20px;
+    }
+    .filters {
+        flex-direction: column;
+    }
+    .filters button {
+        width: 100%;
+    }
+    #registration-search-form {
+        flex-direction: column;
+    }
+    #registration-search-form button {
+        width: 100%;
+    }
+    .navbar {
+        flex-wrap: wrap;
+    }
 }
