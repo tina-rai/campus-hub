@@ -1,11 +1,9 @@
+require("dotenv").config();
+
 const { Pool } = require("pg");
 
 const pool = new Pool({
-    user: "campus_hub_user",
-    host: "localhost",
-    database: "campus_hub",
-    password: "campus_hub_dev",
-    port: 5432
+    connectionString: process.env.DATABASE_URL
 });
 
 pool.connect()
@@ -14,7 +12,10 @@ pool.connect()
         client.release();
     })
     .catch(error => {
-        console.error("PostgreSQL connection error:", error);
+        console.error(
+            "PostgreSQL connection error:",
+            error.message
+        );
     });
 
 module.exports = pool;
