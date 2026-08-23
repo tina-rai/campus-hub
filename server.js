@@ -1,3 +1,8 @@
+require("dotenv").config();
+console.log(
+    "SESSION_SECRET:",
+    process.env.SESSION_SECRET ? "LOADED" : "MISSING"
+);
 const session = require("express-session");
 const {
     createUser,
@@ -315,7 +320,7 @@ app.get("/events/:id", async(req, res) => {
 
 });
 // Register for an event
-app.post("/events/:id/register", async(req, res) => {
+app.post("/events/:id/register", requireAuth, async(req, res) => {
 
     const eventId = Number(req.params.id);
 
@@ -325,16 +330,8 @@ app.post("/events/:id/register", async(req, res) => {
         });
     }
 
-    const {
-        student_name,
-        student_email
-    } = req.body;
-
-    if (!student_name || !student_email) {
-        return res.status(400).json({
-            message: "Student name and email are required"
-        });
-    }
+    const student_name = req.session.user.name;
+    const student_email = req.session.user.email;
 
     try {
 
@@ -403,7 +400,7 @@ app.post("/events/:id/register", async(req, res) => {
 
 });
 // Update an event
-app.put("/events/:id", async(req, res) => {
+app.put("/events/:id", requireAdmin, async(req, res) => {
 
     const id = Number(req.params.id);
 
@@ -480,7 +477,7 @@ app.put("/events/:id", async(req, res) => {
 
 });
 // Delete an event
-app.delete("/events/:id", async(req, res) => {
+app.delete("/events/:id", requireAdmin, async(req, res) => {
 
     const id = Number(req.params.id);
 
@@ -519,7 +516,7 @@ app.delete("/events/:id", async(req, res) => {
 
 });
 // Create a new event
-app.post("/events", async(req, res) => {
+app.post("/events", requireAdmin, async(req, res) => {
 
     const {
         title,
@@ -575,7 +572,7 @@ app.post("/events", async(req, res) => {
 
 });
 // Get registrations for an event
-app.get("/events/:id/registrations", async(req, res) => {
+app.get("/events/:id/registrations", requireAdmin, async(req, res) => {
 
     const eventId = Number(req.params.id);
 
@@ -630,15 +627,9 @@ app.get("/events/:id/registrations", async(req, res) => {
 
 });
 // Get registrations by student email
-app.get("/registrations", async(req, res) => {
+app.get("/registrations", requireAuth, async(req, res) => {
 
-    const { email } = req.query;
-
-    if (!email) {
-        return res.status(400).json({
-            message: "Email is required"
-        });
-    }
+    const email = req.session.user.email;
 
     try {
 
@@ -679,7 +670,7 @@ app.get("/registrations", async(req, res) => {
 
 });
 // Cancel a registration
-app.delete("/registrations/:id", async(req, res) => {
+app.delete("/registrations/:id", requireAuth, async(req, res) => {
 
     const id = Number(req.params.id);
 
@@ -692,7 +683,9 @@ app.delete("/registrations/:id", async(req, res) => {
     try {
 
         const result = await db.query(
-            "DELETE FROM registrations WHERE id = $1 RETURNING *", [id]
+            `DELETE FROM registrations
+             WHERE id = $1 AND student_email = $2
+             RETURNING *`, [id, req.session.user.email]
         );
 
         if (result.rows.length === 0) {
