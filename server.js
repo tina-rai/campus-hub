@@ -1,3 +1,11 @@
+const session = require("express-session");
+const {
+    createUser,
+    findUserByEmail,
+    verifyPassword
+} = require("./auth");
+
+
 const express = require("express");
 const db = require("./postgres");
 const validateEvent = require("./validators/eventValidator");
@@ -6,7 +14,170 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 app.use(express.json());
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 1000 * 60 * 60 * 24
+        }
+    })
+);
 app.use(express.static("public"));
+// =========================
+// AUTHENTICATION
+// =========================
+
+app.post("/api/auth/signup", async(req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                message: "Name, email, and password are required."
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                message: "Password must be at least 6 characters."
+            });
+        }
+
+        const existingUser = await findUserByEmail(email);
+
+        if (existingUser) {
+            return res.status(409).json({
+                message: "An account with this email already exists."
+            });
+        }
+
+        const user = await createUser(name, email, password);
+
+        req.session.user = user;
+
+        res.status(201).json({
+            message: "Account created successfully.",
+            user
+        });
+    } catch (error) {
+        console.error("Signup error:", error);
+
+        res.status(500).json({
+            message: "Unable to create account."
+        });
+    }
+});
+
+
+app.post("/api/auth/login", async(req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required."
+            });
+        }
+
+        const user = await findUserByEmail(email);
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid email or password."
+            });
+        }
+
+        const passwordValid = await verifyPassword(
+            password,
+            user.password_hash
+        );
+
+        if (!passwordValid) {
+            return res.status(401).json({
+                message: "Invalid email or password."
+            });
+        }
+
+        req.session.user = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        };
+
+        res.json({
+            message: "Login successful.",
+            user: req.session.user
+        });
+    } catch (error) {
+        console.error("Login error:", error);
+
+        res.status(500).json({
+            message: "Unable to login."
+        });
+    }
+});
+
+
+app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((error) => {
+        if (error) {
+            console.error("Logout error:", error);
+
+            return res.status(500).json({
+                message: "Unable to logout."
+            });
+        }
+
+        res.json({
+            message: "Logged out successfully."
+        });
+    });
+});
+
+
+app.get("/api/auth/me", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({
+            message: "Not authenticated."
+        });
+    }
+
+    res.json({
+        user: req.session.user
+    });
+});
+
+function requireAuth(req, res, next) {
+    if (!req.session.user) {
+        return res.status(401).json({
+            message: "Authentication required."
+        });
+    }
+
+    next();
+}
+
+
+function requireAdmin(req, res, next) {
+    if (!req.session.user) {
+        return res.status(401).json({
+            message: "Authentication required."
+        });
+    }
+
+    if (req.session.user.role !== "admin") {
+        return res.status(403).json({
+            message: "Admin access required."
+        });
+    }
+
+    next();
+}
 //GET
 app.get("/events", async(req, res) => {
 
