@@ -4,6 +4,7 @@ console.log(
     process.env.SESSION_SECRET ? "LOADED" : "MISSING"
 );
 const session = require("express-session");
+const pgSession = require("connect-pg-simple")(session);
 const {
     createUser,
     findUserByEmail,
@@ -21,6 +22,10 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(
     session({
+        store: new pgSession({
+            pool: db,
+            tableName: "user_sessions"
+        }),
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
