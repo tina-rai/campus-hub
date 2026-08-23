@@ -1,3 +1,4 @@
 node_modules/
 campus.db
-.env
+.envadmin-cookies.txt
+cookies.txt
