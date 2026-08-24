@@ -10,7 +10,7 @@ const eventList =
 const logoutButton =
     document.getElementById("logout-btn");
 
-
+let currentUserId = null;
 async function checkAdmin() {
 
     try {
@@ -28,8 +28,9 @@ async function checkAdmin() {
             return false;
         }
 
-        return true;
+        currentUserId = data.user.id;
 
+        return true;
     } catch (error) {
 
         console.error(error);
@@ -387,7 +388,214 @@ logoutButton.addEventListener("click", async(event) => {
         await checkAdmin();
 
     if (isAdmin) {
+
         loadEvents();
+        loadUsers();
+
     }
 
 })();
+// =========================
+// ADMIN USER MANAGEMENT
+// =========================
+
+const userList =
+    document.getElementById("admin-user-list");
+
+
+async function loadUsers() {
+
+    try {
+
+        const response =
+            await fetch("/api/admin/users");
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            userList.innerHTML =
+                `<p>${data.message || "Failed to load users."}</p>`;
+
+            return;
+        }
+
+        displayUsers(data.users);
+
+    } catch (error) {
+
+        console.error(error);
+
+        userList.innerHTML =
+            "<p>Failed to load users.</p>";
+    }
+}
+
+
+function displayUsers(users) {
+
+    userList.innerHTML = "";
+
+    if (!users.length) {
+
+        userList.innerHTML =
+            "<p>No users found.</p>";
+
+        return;
+    }
+
+    users.forEach(user => {
+
+                const card =
+                    document.createElement("div");
+
+                card.className = "admin-user-card";
+
+                const isCurrentUser =
+                    user.id === currentUserId;
+
+                card.innerHTML = `
+            <div class="admin-user-info">
+
+                <strong>
+                    ${user.name}
+                </strong>
+
+                <span>
+                    ${user.email}
+                </span>
+
+                <span class="user-role ${user.role}">
+                    ${user.role}
+                </span>
+
+            </div>
+
+            <div class="admin-user-actions">
+
+                ${
+                    isCurrentUser
+                    ?
+                    `<span class="current-user-label">
+                        You
+                    </span>`
+                    :
+                    user.role === "student"
+                    ?
+                    `<button
+                        class="promote-user-btn"
+                        data-id="${user.id}">
+                        Make Admin
+                    </button>`
+                    :
+                    `<button
+                        class="demote-user-btn"
+                        data-id="${user.id}">
+                        Remove Admin
+                    </button>`
+                }
+
+            </div>
+        `;
+
+        userList.appendChild(card);
+    });
+
+
+    document
+        .querySelectorAll(".promote-user-btn")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                changeUserRole(
+                    button.dataset.id,
+                    "admin"
+                );
+
+            });
+
+        });
+
+
+    document
+        .querySelectorAll(".demote-user-btn")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                changeUserRole(
+                    button.dataset.id,
+                    "student"
+                );
+
+            });
+
+        });
+}
+
+
+async function changeUserRole(userId, role) {
+
+    const action =
+        role === "admin"
+        ? "promote this user to admin"
+        : "remove admin access from this user";
+
+    const confirmed =
+        confirm(`Are you sure you want to ${action}?`);
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/users/${userId}/role`,
+                {
+                    method: "PATCH",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        role
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.message ||
+                "Failed to change user role."
+            );
+
+            return;
+        }
+
+
+        alert(data.message);
+
+        loadUsers();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Something went wrong."
+        );
+    }
+}
