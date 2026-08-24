@@ -1,22 +1,34 @@
-const searchInput = document.getElementById("search-input");
-const sortFilter = document.getElementById("sort-filter");
+const searchInput =
+    document.getElementById("search-input");
 
-const clearFilters = document.getElementById("clear-filters");
+const sortFilter =
+    document.getElementById("sort-filter");
 
-const resultsCount = document.getElementById("results-count");
+const clearFilters =
+    document.getElementById("clear-filters");
+
+const resultsCount =
+    document.getElementById("results-count");
+
+const eventList =
+    document.getElementById("event-list");
 
 const categoryChips =
     document.querySelectorAll(".chip");
 
 let selectedCategory = "";
-const eventList = document.getElementById("event-list");
+let searchTimer;
+
 
 async function setupAuthUI() {
 
     const user = await getCurrentUser();
 
-    const authArea = document.getElementById("auth-area");
-    const adminLink = document.getElementById("admin-link");
+    const authArea =
+        document.getElementById("auth-area");
+
+    const adminLink =
+        document.getElementById("admin-link");
 
     if (!authArea) {
         return;
@@ -29,7 +41,10 @@ async function setupAuthUI() {
                 Hi, ${user.name}
             </span>
 
-            <button id="logout-btn" class="logout-button">
+            <button
+                id="logout-btn"
+                class="logout-button"
+            >
                 Log Out
             </button>
         `;
@@ -41,72 +56,121 @@ async function setupAuthUI() {
         if (user.role === "admin" && adminLink) {
             adminLink.hidden = false;
         }
-
     }
 }
 
+
 async function loadEvents() {
+
+    eventList.innerHTML =
+        "<p>Loading events...</p>";
 
     try {
 
-        const search = searchInput.value.trim();
-        const category = selectedCategory;
-        const params = new URLSearchParams();
+        const search =
+            searchInput.value.trim();
+
+        const params =
+            new URLSearchParams();
 
         if (search) {
             params.append("search", search);
         }
 
-        if (category) {
-            params.append("category", category);
+        if (selectedCategory) {
+            params.append(
+                "category",
+                selectedCategory
+            );
         }
+
+        const query =
+            params.toString();
 
         const response =
-            await fetch(`/events?${params.toString()}`);
+            await fetch(
+                query ?
+                `/events?${query}` :
+                "/events"
+            );
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || "Failed to load events.");
+            throw new Error(
+                data.message ||
+                "Failed to load events."
+            );
         }
 
-        displayEvents(data.results || data);
+        currentEvents =
+            data.results || data;
+
+        displayEvents(currentEvents);
 
     } catch (error) {
 
         console.error(error);
 
-        eventList.innerHTML =
-            "<p>Failed to load events.</p>";
+        resultsCount.textContent = "";
+
+        eventList.innerHTML = `
+            <p>
+                Failed to load events.
+                Please try again.
+            </p>
+        `;
     }
 }
+
 
 function displayEvents(events) {
 
     eventList.innerHTML = "";
-    resultsCount.textContent =
-        `Showing ${events.length} event${events.length === 1 ? "" : "s"}` +
-        (selectedCategory ? ` in ${selectedCategory}` : "");
 
-    if (events.length === 0) {
+    const sortedEvents = [...events].sort((a, b) => {
 
-        eventList.innerHTML =
-            "<p>No events found.</p>";
+        const first =
+            new Date(`${a.date} ${a.time}`);
 
-        return;
-    }
-    events.sort((a, b) => {
-
-        const first = new Date(`${a.date} ${a.time}`);
-        const second = new Date(`${b.date} ${b.time}`);
+        const second =
+            new Date(`${b.date} ${b.time}`);
 
         if (sortFilter.value === "oldest") {
             return first - second;
         }
 
-        return second - first;
+        return first - second;
     });
-    events.forEach(event => {
+
+
+    resultsCount.textContent =
+        `Showing ${sortedEvents.length} event${
+            sortedEvents.length === 1 ? "" : "s"
+        }${
+            selectedCategory
+                ? ` in ${selectedCategory}`
+                : ""
+        }`;
+
+
+    if (sortedEvents.length === 0) {
+
+        eventList.innerHTML = `
+            <div class="empty-state">
+                <h3>No events found</h3>
+                <p>
+                    Try a different search or category.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    sortedEvents.forEach(event => {
 
         const card =
             document.createElement("div");
@@ -114,9 +178,12 @@ function displayEvents(events) {
         card.className = "event-card";
 
         card.addEventListener("click", () => {
+
             window.location.href =
                 `/event.html?id=${event.id}`;
+
         });
+
 
         card.innerHTML = `
             <span class="event-category">
@@ -140,52 +207,63 @@ function displayEvents(events) {
     });
 }
 
-let timer;
 
-searchInput.addEventListener("input", () => {
+let currentEvents = [];
 
-    clearTimeout(timer);
-
-    timer = setTimeout(loadEvents, 300);
-
-});
 categoryChips.forEach(chip => {
 
     chip.addEventListener("click", () => {
 
-        categoryChips.forEach(button =>
-            button.classList.remove("active")
-        );
+        categoryChips.forEach(button => {
+            button.classList.remove("active");
+        });
 
         chip.classList.add("active");
 
-        selectedCategory = chip.dataset.category;
+        selectedCategory =
+            chip.dataset.category;
 
         loadEvents();
-
     });
 
 });
-sortFilter.addEventListener(
-    "change",
-    loadEvents
-);
+
+
+searchInput.addEventListener("input", () => {
+
+    clearTimeout(searchTimer);
+
+    searchTimer =
+        setTimeout(loadEvents, 300);
+
+});
+
+
+sortFilter.addEventListener("change", () => {
+
+    displayEvents(currentEvents);
+
+});
+
+
 clearFilters.addEventListener("click", () => {
 
     searchInput.value = "";
 
     selectedCategory = "";
 
-    sortFilter.value = "newest";
+    sortFilter.value = "upcoming";
 
-    categoryChips.forEach(button =>
-        button.classList.remove("active")
-    );
+    categoryChips.forEach(button => {
+        button.classList.remove("active");
+    });
 
     categoryChips[0].classList.add("active");
 
     loadEvents();
 
 });
+
+
 setupAuthUI();
 loadEvents();

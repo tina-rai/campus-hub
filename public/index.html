@@ -43,48 +43,39 @@
         <section class="filters">
 
             <div class="search-wrapper">
-                <input type="text" id="search-input" placeholder="🔎 Search events by title, location or description...">
+                <input type="text" id="search-input" placeholder=" Search events..." autocomplete="off">
             </div>
 
             <div class="category-chips">
-
-                <button class="chip active" data-category="">
+                <button type="button" class="chip active" data-category="">
                     All
                 </button>
 
-                <button class="chip" data-category="Workshop">
+                <button type="button" class="chip" data-category="Workshop">
                     Workshop
                 </button>
 
-                <button class="chip" data-category="Competition">
+                <button type="button" class="chip" data-category="Competition">
                     Competition
                 </button>
 
-                <button class="chip" data-category="Seminar">
+                <button type="button" class="chip" data-category="Seminar">
                     Seminar
                 </button>
 
-                <button class="chip" data-category="Club">
+                <button type="button" class="chip" data-category="Club">
                     Club
                 </button>
-
             </div>
 
             <div class="filter-row">
 
                 <select id="sort-filter">
-        
-                    <option value="newest">
-                        Upcoming First
-                    </option>
-        
-                    <option value="oldest">
-                        Oldest First
-                    </option>
-        
+                    <option value="upcoming">Upcoming First</option>
+                    <option value="oldest">Oldest First</option>
                 </select>
 
-                <button id="clear-filters" class="secondary-button">
+                <button type="button" id="clear-filters" class="secondary-button">
                     Clear Filters
                 </button>
 
