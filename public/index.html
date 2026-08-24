@@ -2,15 +2,12 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>CampusHub</title>
 
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -19,45 +16,45 @@
 
         <div class="container">
 
-            <h1>CampusHub</h1>
+            <div class="header-top">
+                <div>
+                    <h1>CampusHub</h1>
+                    <p>Discover what's happening on campus.</p>
+                </div>
 
-            <p>
-                Discover what's happening on campus.
-            </p>
+                <div id="auth-area">
+                    <a class="auth-link" href="/login.html">Log In</a>
+                    <a class="auth-button" href="/signup.html">Sign Up</a>
+                </div>
+            </div>
 
             <nav class="navbar">
-
-                <a href="/">
-                    Events
-                </a>
-
-                <a href="/my-registrations.html">
-                    My Registrations
-                </a>
-
+                <a href="/">Events</a>
+                <a href="/my-registrations.html">My Registrations</a>
+                <a id="admin-link" href="/admin.html" hidden>Admin Dashboard</a>
             </nav>
 
         </div>
 
     </header>
 
-
     <main class="container">
+
         <section class="filters">
 
             <input type="text" id="search-input" placeholder="Search events...">
 
             <select id="category-filter">
-                <option value="">All Categories</option>
-                <option value="Workshop">Workshop</option>
-                <option value="Competition">Competition</option>
-                <option value="Seminar">Seminar</option>
-                <option value="Club">Club</option>
-            </select>
+            <option value="">All Categories</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Competition">Competition</option>
+            <option value="Seminar">Seminar</option>
+            <option value="Club">Club</option>
+        </select>
 
             <button id="search-btn">
-                Search
-            </button>
+            Search
+        </button>
 
         </section>
 
@@ -65,13 +62,15 @@
 
             <h2>Upcoming Events</h2>
 
-            <div id="event-list"></div>
+            <div id="event-list">
+                <p>Loading events...</p>
+            </div>
 
         </section>
 
     </main>
 
-
+    <script src="auth.js"></script>
     <script src="app.js"></script>
 
 </body>

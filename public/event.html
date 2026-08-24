@@ -4,7 +4,6 @@
 <head>
 
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Event Details - CampusHub</title>
@@ -19,19 +18,31 @@
 
         <div class="container">
 
-            <h1>CampusHub</h1>
+            <div class="header-top">
 
-            <p>Event Details</p>
+                <div>
+                    <h1>CampusHub</h1>
+                    <p>Event Details</p>
+                </div>
+
+                <div id="auth-area">
+                    <a class="auth-link" href="/login.html">Log In</a>
+                    <a class="auth-button" href="/signup.html">Sign Up</a>
+                </div>
+
+            </div>
 
             <nav class="navbar">
 
-                <a href="/">
-                    Events
-                </a>
+                <a href="/">Events</a>
 
                 <a href="/my-registrations.html">
-                    My Registrations
-                </a>
+                My Registrations
+            </a>
+
+                <a id="admin-link" href="/admin.html" hidden>
+                Admin Dashboard
+            </a>
 
             </nav>
 
@@ -49,33 +60,21 @@
 
             <h2>Register for this event</h2>
 
-            <form id="registration-form">
+            <p id="registration-status">
+                Checking your login status...
+            </p>
 
-                <input type="text" id="student-name" placeholder="Your name" required>
-
-                <input type="email" id="student-email" placeholder="Your email" required>
-
-                <button type="submit">
-                    Register
-                </button>
-
-            </form>
+            <button id="register-button" class="primary-button" hidden>
+            Register for Event
+        </button>
 
             <p id="registration-message"></p>
-
-        </section>
-        <section class="events-section registration-list-section">
-
-            <h2>Registered Students</h2>
-
-            <div id="registration-list">
-                <p>Loading registrations...</p>
-            </div>
 
         </section>
 
     </main>
 
+    <script src="auth.js"></script>
     <script src="event.js"></script>
 
 </body>

@@ -355,3 +355,337 @@ body {
 .auth-card a {
     text-decoration: none;
 }
+
+
+/* =========================
+   Authentication Navigation
+   ========================= */
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+#auth-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.auth-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-button {
+    display: inline-block;
+    padding: 10px 16px;
+    background: white;
+    color: #2f80ed;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-button:hover {
+    background: #eef5ff;
+}
+
+.user-greeting {
+    font-weight: 600;
+}
+
+.logout-button {
+    padding: 9px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.logout-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+
+/* =========================
+   Buttons
+   ========================= */
+
+.primary-button {
+    padding: 13px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #2f80ed;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.primary-button:hover {
+    background: #1768d1;
+}
+
+.primary-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* =========================
+   Empty States
+   ========================= */
+
+.empty-state {
+    text-align: center;
+    padding: 35px 20px;
+}
+
+.empty-state h3 {
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+
+/* =========================
+   Admin Dashboard
+   ========================= */
+
+.admin-container {
+    display: grid;
+    gap: 25px;
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+}
+
+.admin-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.admin-event-card {
+    border: 1px solid #e1e5eb;
+    border-radius: 12px;
+    padding: 22px;
+    margin-top: 15px;
+    background: #fafcff;
+}
+
+.admin-event-card h3 {
+    margin: 8px 0 12px;
+}
+
+.admin-event-card p {
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.admin-actions button {
+    padding: 9px 14px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.view-registrations-btn {
+    background: #2f80ed;
+    color: white;
+}
+
+.edit-event-btn {
+    background: #f0ad4e;
+    color: white;
+}
+
+.delete-event-btn {
+    background: #d9534f;
+    color: white;
+}
+
+.registrations-panel {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #ddd;
+}
+
+.registrations-panel h4 {
+    margin-bottom: 10px;
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+}
+
+.admin-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.admin-form button {
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #2f80ed;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-form button:hover {
+    background: #1768d1;
+}
+
+.admin-events-section {
+    margin-top: 25px;
+}
+
+#admin-event-list {
+    display: grid;
+    gap: 20px;
+}
+
+.admin-event-card {
+    border: 1px solid #e1e5eb;
+    border-radius: 12px;
+    padding: 22px;
+    background: #fafcff;
+}
+
+.admin-event-card h3 {
+    margin-bottom: 12px;
+}
+
+.admin-event-card p {
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.admin-actions button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.view-registrations-btn {
+    background: #2f80ed;
+    color: white;
+}
+
+.delete-event-btn {
+    background: #d9534f;
+    color: white;
+}
+
+.view-registrations-btn:hover {
+    background: #1768d1;
+}
+
+.delete-event-btn:hover {
+    background: #c9302c;
+}
+
+.registrations {
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.admin-registration {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px;
+    margin-top: 8px;
+    background: white;
+    border-radius: 8px;
+}
+
+.admin-registration span {
+    color: #666;
+}
+
+@media (max-width: 600px) {
+    .admin-registration {
+        flex-direction: column;
+    }
+}
+
+
+/* =========================
+   Responsive Header
+   ========================= */
+
+@media (max-width: 600px) {
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #auth-area {
+        width: 100%;
+    }
+    .auth-button {
+        text-align: center;
+    }
+    .admin-actions {
+        flex-direction: column;
+    }
+    .admin-actions button {
+        width: 100%;
+    }
+}

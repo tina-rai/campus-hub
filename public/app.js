@@ -1,12 +1,41 @@
-const searchInput =
-    document.getElementById("search-input");
-
-const categoryFilter =
-    document.getElementById("category-filter");
-
-const searchButton =
-    document.getElementById("search-btn");
+const searchInput = document.getElementById("search-input");
+const categoryFilter = document.getElementById("category-filter");
+const searchButton = document.getElementById("search-btn");
 const eventList = document.getElementById("event-list");
+
+async function setupAuthUI() {
+
+    const user = await getCurrentUser();
+
+    const authArea = document.getElementById("auth-area");
+    const adminLink = document.getElementById("admin-link");
+
+    if (!authArea) {
+        return;
+    }
+
+    if (user) {
+
+        authArea.innerHTML = `
+            <span class="user-greeting">
+                Hi, ${user.name}
+            </span>
+
+            <button id="logout-btn" class="logout-button">
+                Log Out
+            </button>
+        `;
+
+        document
+            .getElementById("logout-btn")
+            .addEventListener("click", logout);
+
+        if (user.role === "admin" && adminLink) {
+            adminLink.hidden = false;
+        }
+
+    }
+}
 
 async function loadEvents() {
 
@@ -28,8 +57,11 @@ async function loadEvents() {
         const response =
             await fetch(`/events?${params.toString()}`);
 
-        const data =
-            await response.json();
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to load events.");
+        }
 
         displayEvents(data.results || data);
 
@@ -39,12 +71,8 @@ async function loadEvents() {
 
         eventList.innerHTML =
             "<p>Failed to load events.</p>";
-
     }
-
 }
-
-searchButton.addEventListener("click", loadEvents);
 
 function displayEvents(events) {
 
@@ -56,7 +84,6 @@ function displayEvents(events) {
             "<p>No events found.</p>";
 
         return;
-
     }
 
     events.forEach(event => {
@@ -67,7 +94,8 @@ function displayEvents(events) {
         card.className = "event-card";
 
         card.addEventListener("click", () => {
-            window.location.href = `/event.html?id=${event.id}`;
+            window.location.href =
+                `/event.html?id=${event.id}`;
         });
 
         card.innerHTML = `
@@ -79,27 +107,20 @@ function displayEvents(events) {
 
             <p>${event.description}</p>
 
-            <p>
-                📍 ${event.location}
-            </p>
+            <p>📍 ${event.location}</p>
 
-            <p>
-                📅 ${event.date}
-            </p>
+            <p>📅 ${event.date}</p>
 
-            <p>
-                🕐 ${event.time}
-            </p>
+            <p>🕐 ${event.time}</p>
 
-            <p>
-                👥 Capacity: ${event.capacity}
-            </p>
+            <p>👥 Capacity: ${event.capacity}</p>
         `;
 
         eventList.appendChild(card);
-
     });
-
 }
 
+searchButton.addEventListener("click", loadEvents);
+
+setupAuthUI();
 loadEvents();

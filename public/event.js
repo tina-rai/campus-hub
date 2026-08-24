@@ -1,12 +1,74 @@
-const registrationForm =
-    document.getElementById("registration-form");
+const eventDetails =
+    document.getElementById("event-details");
+
+const registrationSection =
+    document.getElementById("registration-section");
+
+const registrationStatus =
+    document.getElementById("registration-status");
+
+const registerButton =
+    document.getElementById("register-button");
 
 const registrationMessage =
     document.getElementById("registration-message");
-const registrationList =
-    document.getElementById("registration-list");
-const eventDetails =
-    document.getElementById("event-details");
+
+
+async function setupAuthUI() {
+
+    const user = await getCurrentUser();
+
+    const authArea =
+        document.getElementById("auth-area");
+
+    const adminLink =
+        document.getElementById("admin-link");
+
+    if (user) {
+
+        authArea.innerHTML = `
+            <span class="user-greeting">
+                Hi, ${user.name}
+            </span>
+
+            <button id="logout-btn" class="logout-button">
+                Log Out
+            </button>
+        `;
+
+        document
+            .getElementById("logout-btn")
+            .addEventListener("click", logout);
+
+        if (user.role === "admin") {
+
+            adminLink.hidden = false;
+
+            registrationStatus.textContent =
+                "You are logged in as an administrator.";
+
+            registerButton.hidden = false;
+
+        } else {
+
+            registrationStatus.textContent =
+                `Logged in as ${user.name}.`;
+
+            registerButton.hidden = false;
+        }
+
+    } else {
+
+        registrationStatus.innerHTML = `
+            Please
+            <a href="/login.html">log in</a>
+            to register for this event.
+        `;
+
+        registerButton.hidden = true;
+    }
+}
+
 
 async function loadEvent() {
 
@@ -18,8 +80,10 @@ async function loadEvent() {
         const id = params.get("id");
 
         if (!id) {
+
             eventDetails.innerHTML =
                 "<p>Event ID is missing.</p>";
+
             return;
         }
 
@@ -63,26 +127,26 @@ async function loadEvent() {
             </p>
 
             <p>
-    👥 <strong>Capacity:</strong>
-    ${event.capacity}
-</p>
+                👥 <strong>Capacity:</strong>
+                ${event.capacity}
+            </p>
 
-<p>
-    🎟️ <strong>Registered:</strong>
-    ${event.registered}
-</p>
+            <p>
+                🎟️ <strong>Registered:</strong>
+                ${event.registered}
+            </p>
 
-<p>
-    🪑 <strong>Seats remaining:</strong>
-    ${event.remaining}
-</p>
+            <p>
+                🪑 <strong>Seats remaining:</strong>
+                ${event.remaining}
+            </p>
 
             <button
                 class="back-button"
-                onclick="window.location.href='/'">
+                onclick="window.location.href='/'"
+            >
                 ← Back to Events
             </button>
-
         `;
 
     } catch (error) {
@@ -91,48 +155,43 @@ async function loadEvent() {
 
         eventDetails.innerHTML =
             "<p>Failed to load event.</p>";
-
     }
-
 }
-async function registerForEvent(eventId) {
 
-    const studentName =
-        document.getElementById("student-name").value.trim();
 
-    const studentEmail =
-        document.getElementById("student-email").value.trim();
+async function registerForEvent() {
 
-    if (!studentName || !studentEmail) {
-        registrationMessage.textContent =
-            "Please enter your name and email.";
+    const params =
+        new URLSearchParams(window.location.search);
 
-        return;
-    }
+    const eventId =
+        params.get("id");
+
+    registerButton.disabled = true;
+
+    registrationMessage.textContent =
+        "Registering...";
 
     try {
 
-        const response = await fetch(
-            `/events/${eventId}/register`, {
+        const response =
+            await fetch(`/events/${eventId}/register`, {
                 method: "POST",
-
                 headers: {
                     "Content-Type": "application/json"
                 },
+                body: JSON.stringify({})
+            });
 
-                body: JSON.stringify({
-                    student_name: studentName,
-                    student_email: studentEmail
-                })
-            }
-        );
-
-        const data = await response.json();
+        const data =
+            await response.json();
 
         if (!response.ok) {
 
             registrationMessage.textContent =
                 data.message || "Registration failed.";
+
+            registerButton.disabled = false;
 
             return;
         }
@@ -140,7 +199,8 @@ async function registerForEvent(eventId) {
         registrationMessage.textContent =
             "Registration successful!";
 
-        registrationForm.reset();
+        registerButton.textContent =
+            "Registered ✓";
 
     } catch (error) {
 
@@ -149,85 +209,16 @@ async function registerForEvent(eventId) {
         registrationMessage.textContent =
             "Something went wrong. Please try again.";
 
+        registerButton.disabled = false;
     }
-
 }
-async function loadRegistrations(eventId) {
 
-    try {
 
-        const response =
-            await fetch(`/events/${eventId}/registrations`);
+registerButton.addEventListener(
+    "click",
+    registerForEvent
+);
 
-        const data =
-            await response.json();
 
-        if (!response.ok) {
-            registrationList.innerHTML =
-                `<p>${data.message}</p>`;
-            return;
-        }
-
-        if (data.registrations.length === 0) {
-
-            registrationList.innerHTML =
-                "<p>No students registered yet.</p>";
-
-            return;
-        }
-
-        registrationList.innerHTML = "";
-
-        data.registrations.forEach((registration, index) => {
-
-            const student =
-                document.createElement("div");
-
-            student.className = "registration-card";
-
-            student.innerHTML = `
-                <strong>
-                    ${index + 1}. ${registration.student_name}
-                </strong>
-
-                <p>
-                    ${registration.student_email}
-                </p>
-            `;
-
-            registrationList.appendChild(student);
-
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        registrationList.innerHTML =
-            "<p>Failed to load registrations.</p>";
-
-    }
-
-}
-registrationForm.addEventListener("submit", async(event) => {
-
-    event.preventDefault();
-
-    const params =
-        new URLSearchParams(window.location.search);
-
-    const eventId = params.get("id");
-
-    await registerForEvent(eventId);
-
-});
+setupAuthUI();
 loadEvent();
-
-const params =
-    new URLSearchParams(window.location.search);
-
-const eventId = params.get("id");
-
-if (eventId) {
-    loadRegistrations(eventId);
-}

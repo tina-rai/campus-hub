@@ -14,23 +14,43 @@
 </head>
 
 <body>
+
     <header class="header">
 
         <div class="container">
 
-            <h1>CampusHub</h1>
+            <div class="header-top">
 
-            <p>My Registrations</p>
+                <div>
+                    <h1>CampusHub</h1>
+                    <p>My Registrations</p>
+                </div>
+
+                <div id="auth-area">
+                    <a class="auth-link" href="/login.html">
+                    Log In
+                </a>
+
+                    <a class="auth-button" href="/signup.html">
+                    Sign Up
+                </a>
+                </div>
+
+            </div>
 
             <nav class="navbar">
 
                 <a href="/">
-                    Events
-                </a>
+                Events
+            </a>
 
                 <a href="/my-registrations.html">
-                    My Registrations
-                </a>
+                My Registrations
+            </a>
+
+                <a id="admin-link" href="/admin.html" hidden>
+                Admin Dashboard
+            </a>
 
             </nav>
 
@@ -42,32 +62,17 @@
 
         <section class="events-section">
 
-            <h2>Find Your Registrations</h2>
-
-            <form id="registration-search-form">
-
-                <input type="email" id="student-email" placeholder="Enter your email" required>
-
-                <button type="submit">
-                    Find My Events
-                </button>
-
-            </form>
-
-        </section>
-
-        <section class="events-section">
-
-            <h2>Registered Events</h2>
+            <h2>My Registered Events</h2>
 
             <div id="my-registrations">
-                <p>Enter your email to find your events.</p>
+                <p>Loading...</p>
             </div>
 
         </section>
 
     </main>
 
+    <script src="auth.js"></script>
     <script src="my-registrations.js"></script>
 
 </body>
