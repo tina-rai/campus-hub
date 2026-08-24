@@ -187,7 +187,126 @@ function requireAdmin(req, res, next) {
     }
 
     next();
-}
+} // =========================
+// ADMIN USER MANAGEMENT
+// =========================
+
+// Get all users
+app.get("/api/admin/users", requireAdmin, async(req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT id, name, email, role
+            FROM users
+            ORDER BY id ASC
+        `);
+
+        res.json({
+            users: result.rows
+        });
+
+    } catch (error) {
+        console.error("Get users error:", error);
+
+        res.status(500).json({
+            message: "Unable to load users."
+        });
+    }
+});
+
+
+// Change a user's role
+app.patch("/api/admin/users/:id/role", requireAdmin, async(req, res) => {
+    const userId = Number(req.params.id);
+    const { role } = req.body;
+
+    if (!Number.isInteger(userId)) {
+        return res.status(400).json({
+            message: "Invalid user ID."
+        });
+    }
+
+    if (role !== "student" && role !== "admin") {
+        return res.status(400).json({
+            message: "Role must be either student or admin."
+        });
+    }
+
+    // Prevent an admin from changing their own role.
+    if (userId === req.session.user.id) {
+        return res.status(400).json({
+            message: "You cannot change your own role."
+        });
+    }
+
+    try {
+        // Check that the target user exists.
+        const userResult = await db.query(
+            `
+            SELECT id, name, email, role
+            FROM users
+            WHERE id = $1
+            `, [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                message: "User not found."
+            });
+        }
+
+        const targetUser = userResult.rows[0];
+
+        // Nothing to change.
+        if (targetUser.role === role) {
+            return res.json({
+                message: `User is already a ${role}.`,
+                user: targetUser
+            });
+        }
+
+        // Prevent removing the last administrator.
+        if (
+            targetUser.role === "admin" &&
+            role === "student"
+        ) {
+            const adminCountResult = await db.query(`
+                SELECT COUNT(*)::int AS count
+                FROM users
+                WHERE role = 'admin'
+            `);
+
+            const adminCount =
+                adminCountResult.rows[0].count;
+
+            if (adminCount <= 1) {
+                return res.status(400).json({
+                    message: "Cannot remove the last administrator."
+                });
+            }
+        }
+
+        const result = await db.query(
+            `
+            UPDATE users
+            SET role = $1
+            WHERE id = $2
+            RETURNING id, name, email, role
+            `, [role, userId]
+        );
+
+        res.json({
+            message: `User role changed to ${role}.`,
+            user: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("Change user role error:", error);
+
+        res.status(500).json({
+            message: "Unable to change user role."
+        });
+    }
+});
 //GET
 app.get("/events", async(req, res) => {
 
