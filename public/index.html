@@ -42,19 +42,55 @@
 
         <section class="filters">
 
-            <input type="text" id="search-input" placeholder="Search events...">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" placeholder="🔎 Search events by title, location or description...">
+            </div>
 
-            <select id="category-filter">
-            <option value="">All Categories</option>
-            <option value="Workshop">Workshop</option>
-            <option value="Competition">Competition</option>
-            <option value="Seminar">Seminar</option>
-            <option value="Club">Club</option>
-        </select>
+            <div class="category-chips">
 
-            <button id="search-btn">
-            Search
-        </button>
+                <button class="chip active" data-category="">
+                    All
+                </button>
+
+                <button class="chip" data-category="Workshop">
+                    Workshop
+                </button>
+
+                <button class="chip" data-category="Competition">
+                    Competition
+                </button>
+
+                <button class="chip" data-category="Seminar">
+                    Seminar
+                </button>
+
+                <button class="chip" data-category="Club">
+                    Club
+                </button>
+
+            </div>
+
+            <div class="filter-row">
+
+                <select id="sort-filter">
+        
+                    <option value="newest">
+                        Upcoming First
+                    </option>
+        
+                    <option value="oldest">
+                        Oldest First
+                    </option>
+        
+                </select>
+
+                <button id="clear-filters" class="secondary-button">
+                    Clear Filters
+                </button>
+
+            </div>
+
+            <p id="results-count" class="results-count"></p>
 
         </section>
 

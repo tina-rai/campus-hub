@@ -780,6 +780,74 @@ body {
 }
 
 
+/* ===========================
+   EVENT SEARCH + FILTERS
+=========================== */
+
+.filters {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.search-wrapper input {
+    width: 100%;
+}
+
+.category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.chip {
+    border: none;
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    background: #edf2ff;
+    color: #3730a3;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.chip:hover {
+    transform: translateY(-2px);
+}
+
+.chip.active {
+    background: #4338ca;
+    color: white;
+}
+
+.filter-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.results-count {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.secondary-button {
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.secondary-button:hover {
+    background: #f8fafc;
+}
+
+
 /* =========================
    Responsive Header
    ========================= */

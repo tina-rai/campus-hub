@@ -1,6 +1,14 @@
 const searchInput = document.getElementById("search-input");
-const categoryFilter = document.getElementById("category-filter");
-const searchButton = document.getElementById("search-btn");
+const sortFilter = document.getElementById("sort-filter");
+
+const clearFilters = document.getElementById("clear-filters");
+
+const resultsCount = document.getElementById("results-count");
+
+const categoryChips =
+    document.querySelectorAll(".chip");
+
+let selectedCategory = "";
 const eventList = document.getElementById("event-list");
 
 async function setupAuthUI() {
@@ -42,8 +50,7 @@ async function loadEvents() {
     try {
 
         const search = searchInput.value.trim();
-        const category = categoryFilter.value;
-
+        const category = selectedCategory;
         const params = new URLSearchParams();
 
         if (search) {
@@ -77,6 +84,9 @@ async function loadEvents() {
 function displayEvents(events) {
 
     eventList.innerHTML = "";
+    resultsCount.textContent =
+        `Showing ${events.length} event${events.length === 1 ? "" : "s"}` +
+        (selectedCategory ? ` in ${selectedCategory}` : "");
 
     if (events.length === 0) {
 
@@ -85,7 +95,17 @@ function displayEvents(events) {
 
         return;
     }
+    events.sort((a, b) => {
 
+        const first = new Date(`${a.date} ${a.time}`);
+        const second = new Date(`${b.date} ${b.time}`);
+
+        if (sortFilter.value === "oldest") {
+            return first - second;
+        }
+
+        return second - first;
+    });
     events.forEach(event => {
 
         const card =
@@ -120,7 +140,52 @@ function displayEvents(events) {
     });
 }
 
-searchButton.addEventListener("click", loadEvents);
+let timer;
 
+searchInput.addEventListener("input", () => {
+
+    clearTimeout(timer);
+
+    timer = setTimeout(loadEvents, 300);
+
+});
+categoryChips.forEach(chip => {
+
+    chip.addEventListener("click", () => {
+
+        categoryChips.forEach(button =>
+            button.classList.remove("active")
+        );
+
+        chip.classList.add("active");
+
+        selectedCategory = chip.dataset.category;
+
+        loadEvents();
+
+    });
+
+});
+sortFilter.addEventListener(
+    "change",
+    loadEvents
+);
+clearFilters.addEventListener("click", () => {
+
+    searchInput.value = "";
+
+    selectedCategory = "";
+
+    sortFilter.value = "newest";
+
+    categoryChips.forEach(button =>
+        button.classList.remove("active")
+    );
+
+    categoryChips[0].classList.add("active");
+
+    loadEvents();
+
+});
 setupAuthUI();
 loadEvents();
