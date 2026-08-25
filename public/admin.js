@@ -1,16 +1,116 @@
 const eventForm =
     document.getElementById("event-form");
 
-const eventMessage =
-    document.getElementById("event-message");
-
 const eventList =
     document.getElementById("admin-event-list");
+
+const userList =
+    document.getElementById("admin-user-list");
 
 const logoutButton =
     document.getElementById("logout-btn");
 
+const toast =
+    document.getElementById("toast");
+
+const navButtons =
+    document.querySelectorAll(".admin-nav-btn");
+
+const quickActionButtons =
+    document.querySelectorAll(".quick-action-btn");
+
 let currentUserId = null;
+let toastTimer = null;
+let allEvents = [];
+let allUsers = [];
+
+
+// =========================
+// TOAST NOTIFICATIONS
+// =========================
+
+function showToast(message, type = "success") {
+
+    clearTimeout(toastTimer);
+
+    toast.textContent = message;
+
+    toast.className =
+        `admin-toast show ${type}`;
+
+    toastTimer = setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 3000);
+}
+
+
+// =========================
+// SECTION NAVIGATION
+// =========================
+
+function showSection(sectionId) {
+
+    document
+        .querySelectorAll(".admin-page-section")
+        .forEach(section => {
+
+            section.classList.toggle(
+                "active",
+                section.id === sectionId
+            );
+
+        });
+
+
+    navButtons.forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.section === sectionId
+        );
+
+    });
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+navButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        showSection(
+            button.dataset.section
+        );
+
+    });
+
+});
+
+
+quickActionButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        showSection(
+            button.dataset.section
+        );
+
+    });
+
+});
+
+
+// =========================
+// ADMIN CHECK
+// =========================
+
 async function checkAdmin() {
 
     try {
@@ -21,26 +121,37 @@ async function checkAdmin() {
         const data =
             await response.json();
 
-        if (!response.ok || data.user.role !== "admin") {
+        if (!response.ok ||
+            !data.user ||
+            data.user.role !== "admin"
+        ) {
 
-            window.location.href = "/login.html";
+            window.location.href =
+                "/login.html";
 
             return false;
         }
 
-        currentUserId = data.user.id;
+        currentUserId =
+            data.user.id;
 
         return true;
+
     } catch (error) {
 
         console.error(error);
 
-        window.location.href = "/login.html";
+        window.location.href =
+            "/login.html";
 
         return false;
     }
 }
 
+
+// =========================
+// LOAD EVENTS
+// =========================
 
 async function loadEvents() {
 
@@ -55,12 +166,20 @@ async function loadEvents() {
         if (!response.ok) {
 
             eventList.innerHTML =
-                `<p>${data.message || "Failed to load events."}</p>`;
+                `<p>${
+                    data.message ||
+                    "Failed to load events."
+                }</p>`;
 
             return;
         }
 
-        displayEvents(data.results || data);
+        allEvents =
+            data.results || data;
+
+        displayEvents(allEvents);
+
+        updateDashboardStats();
 
     } catch (error) {
 
@@ -71,6 +190,10 @@ async function loadEvents() {
     }
 }
 
+
+// =========================
+// DISPLAY EVENTS
+// =========================
 
 function displayEvents(events) {
 
@@ -84,29 +207,50 @@ function displayEvents(events) {
         return;
     }
 
+
     events.forEach(event => {
 
         const card =
             document.createElement("div");
 
-        card.className = "admin-event-card";
+        card.className =
+            "admin-event-card";
+
 
         card.innerHTML = `
-            <span class="event-category">
-                ${event.category}
-            </span>
 
-            <h3>${event.title}</h3>
+            <div class="admin-event-info">
 
-            <p>${event.description}</p>
+                <span class="event-category">
+                    ${event.category}
+                </span>
 
-            <p>📍 ${event.location}</p>
+                <h3>
+                    ${event.title}
+                </h3>
 
-            <p>📅 ${event.date}</p>
+                <p>
+                    ${event.description}
+                </p>
 
-            <p>🕐 ${event.time}</p>
+                <p>
+                    📍 ${event.location}
+                </p>
 
-            <p>👥 Capacity: ${event.capacity}</p>
+                <p>
+                    📅 ${event.date}
+                </p>
+
+                <p>
+                    🕐 ${event.time}
+                </p>
+
+                <p>
+                    👥 Capacity: ${event.capacity}
+                </p>
+
+            </div>
+
 
             <div class="admin-actions">
 
@@ -124,13 +268,17 @@ function displayEvents(events) {
 
             </div>
 
+
             <div
                 class="registrations"
                 id="registrations-${event.id}">
             </div>
+
         `;
 
+
         eventList.appendChild(card);
+
     });
 
 
@@ -138,106 +286,190 @@ function displayEvents(events) {
         .querySelectorAll(".delete-event-btn")
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                deleteEvent(button.dataset.id);
+                    deleteEvent(
+                        button.dataset.id
+                    );
 
-            });
+                }
+            );
 
         });
 
 
     document
-        .querySelectorAll(".view-registrations-btn")
+        .querySelectorAll(
+            ".view-registrations-btn"
+        )
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                loadRegistrations(button.dataset.id);
+                    loadRegistrations(
+                        button.dataset.id
+                    );
 
-            });
+                }
+            );
 
         });
 }
 
 
-eventForm.addEventListener("submit", async(event) => {
+// =========================
+// CREATE EVENT
+// =========================
 
-    event.preventDefault();
+eventForm.addEventListener(
+    "submit",
+    async event => {
 
-    eventMessage.textContent =
-        "Creating event...";
-
-
-    const eventData = {
-
-        title: document.getElementById("title").value.trim(),
-
-        description: document.getElementById("description").value.trim(),
-
-        category: document.getElementById("category").value,
-
-        location: document.getElementById("location").value.trim(),
-
-        date: document.getElementById("date").value,
-
-        time: document.getElementById("time").value,
-
-        capacity: Number(document.getElementById("capacity").value)
-    };
+        event.preventDefault();
 
 
-    try {
+        const submitButton =
+            eventForm.querySelector(
+                "button[type='submit']"
+            );
 
-        const response =
-            await fetch("/events", {
+        submitButton.disabled = true;
 
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify(eventData)
-            });
+        submitButton.textContent =
+            "Creating...";
 
 
-        const data =
-            await response.json();
+        const eventData = {
+
+            title: document
+                .getElementById("title")
+                .value
+                .trim(),
+
+            description: document
+                .getElementById("description")
+                .value
+                .trim(),
+
+            category: document
+                .getElementById("category")
+                .value,
+
+            location: document
+                .getElementById("location")
+                .value
+                .trim(),
+
+            date: document
+                .getElementById("date")
+                .value,
+
+            time: document
+                .getElementById("time")
+                .value,
+
+            capacity: Number(
+                document
+                .getElementById("capacity")
+                .value
+            )
+        };
 
 
-        if (!response.ok) {
+        try {
 
-            eventMessage.textContent =
-                data.message || "Failed to create event.";
+            const response =
+                await fetch("/events", {
 
-            return;
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(eventData)
+
+                });
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                showToast(
+                    data.message ||
+                    "Failed to create event.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            eventForm.reset();
+
+            showToast(
+                "Event created successfully!",
+                "success"
+            );
+
+
+            await loadEvents();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showToast(
+                "Something went wrong.",
+                "error"
+            );
+
+        } finally {
+
+            submitButton.disabled = false;
+
+            submitButton.textContent =
+                "Create Event";
         }
 
-
-        eventMessage.textContent =
-            "Event created successfully!";
-
-        eventForm.reset();
-
-        loadEvents();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        eventMessage.textContent =
-            "Something went wrong.";
     }
+);
 
-});
 
+// =========================
+// DELETE EVENT
+// =========================
 
 async function deleteEvent(eventId) {
 
+    const event =
+        allEvents.find(
+            item =>
+            String(item.id) ===
+            String(eventId)
+        );
+
+
+    const eventName =
+        event ?
+        event.title :
+        "this event";
+
+
     const confirmed =
-        confirm("Are you sure you want to delete this event?");
+        confirm(
+            `Delete "${eventName}"?\n\n` +
+            `This action cannot be undone.`
+        );
+
 
     if (!confirmed) {
         return;
@@ -247,9 +479,11 @@ async function deleteEvent(eventId) {
     try {
 
         const response =
-            await fetch(`/events/${eventId}`, {
-                method: "DELETE"
-            });
+            await fetch(
+                `/events/${eventId}`, {
+                    method: "DELETE"
+                }
+            );
 
 
         const data =
@@ -258,28 +492,40 @@ async function deleteEvent(eventId) {
 
         if (!response.ok) {
 
-            alert(
+            showToast(
                 data.message ||
-                "Failed to delete event."
+                "Failed to delete event.",
+                "error"
             );
 
             return;
         }
 
 
-        alert("Event deleted successfully.");
+        showToast(
+            "Event deleted successfully!",
+            "success"
+        );
 
-        loadEvents();
+
+        await loadEvents();
 
 
     } catch (error) {
 
         console.error(error);
 
-        alert("Something went wrong.");
+        showToast(
+            "Something went wrong.",
+            "error"
+        );
     }
 }
 
+
+// =========================
+// REGISTRATIONS
+// =========================
 
 async function loadRegistrations(eventId) {
 
@@ -308,7 +554,10 @@ async function loadRegistrations(eventId) {
         if (!response.ok) {
 
             container.innerHTML =
-                `<p>${data.message || "Failed to load registrations."}</p>`;
+                `<p>${
+                    data.message ||
+                    "Failed to load registrations."
+                }</p>`;
 
             return;
         }
@@ -325,31 +574,42 @@ async function loadRegistrations(eventId) {
 
         container.innerHTML = `
             <h4>
-                Registered Students (${data.count})
+                Registered Students
+                (${data.count})
             </h4>
         `;
 
 
-        data.registrations.forEach(registration => {
+        data.registrations.forEach(
+            registration => {
 
-            const student =
-                document.createElement("div");
+                const student =
+                    document.createElement(
+                        "div"
+                    );
 
-            student.className =
-                "admin-registration";
 
-            student.innerHTML = `
-                <strong>
-                    ${registration.student_name}
-                </strong>
+                student.className =
+                    "admin-registration";
 
-                <span>
-                    ${registration.student_email}
-                </span>
-            `;
 
-            container.appendChild(student);
-        });
+                student.innerHTML = `
+                    <strong>
+                        ${registration.student_name}
+                    </strong>
+
+                    <span>
+                        ${registration.student_email}
+                    </span>
+                `;
+
+
+                container.appendChild(
+                    student
+                );
+
+            }
+        );
 
 
     } catch (error) {
@@ -362,66 +622,43 @@ async function loadRegistrations(eventId) {
 }
 
 
-logoutButton.addEventListener("click", async(event) => {
-
-    event.preventDefault();
-
-    try {
-
-        await fetch("/api/auth/logout", {
-            method: "POST"
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-    }
-
-    window.location.href = "/login.html";
-});
-
-
-(async() => {
-
-    const isAdmin =
-        await checkAdmin();
-
-    if (isAdmin) {
-
-        loadEvents();
-        loadUsers();
-
-    }
-
-})();
 // =========================
-// ADMIN USER MANAGEMENT
+// USERS
 // =========================
-
-const userList =
-    document.getElementById("admin-user-list");
-
 
 async function loadUsers() {
 
     try {
 
         const response =
-            await fetch("/api/admin/users");
+            await fetch(
+                "/api/admin/users"
+            );
+
 
         const data =
             await response.json();
 
+
         if (!response.ok) {
 
             userList.innerHTML =
-                `<p>${data.message || "Failed to load users."}</p>`;
+                `<p>${
+                    data.message ||
+                    "Failed to load users."
+                }</p>`;
 
             return;
         }
 
-        displayUsers(data.users);
+
+        allUsers =
+            data.users || [];
+
+        displayUsers(allUsers);
+
+        updateDashboardStats();
+
 
     } catch (error) {
 
@@ -437,6 +674,7 @@ function displayUsers(users) {
 
     userList.innerHTML = "";
 
+
     if (!users.length) {
 
         userList.innerHTML =
@@ -445,17 +683,23 @@ function displayUsers(users) {
         return;
     }
 
+
     users.forEach(user => {
 
                 const card =
                     document.createElement("div");
 
-                card.className = "admin-user-card";
+
+                card.className =
+                    "admin-user-card";
+
 
                 const isCurrentUser =
                     user.id === currentUserId;
 
+
                 card.innerHTML = `
+
             <div class="admin-user-info">
 
                 <strong>
@@ -466,29 +710,41 @@ function displayUsers(users) {
                     ${user.email}
                 </span>
 
-                <span class="user-role ${user.role}">
+                <span
+                    class="user-role ${user.role}">
                     ${user.role}
                 </span>
 
             </div>
 
-            <div class="admin-user-actions">
+
+            <div
+                class="admin-user-actions">
 
                 ${
                     isCurrentUser
+
                     ?
-                    `<span class="current-user-label">
+
+                    `<span
+                        class="current-user-label">
                         You
                     </span>`
+
                     :
+
                     user.role === "student"
+
                     ?
+
                     `<button
                         class="promote-user-btn"
                         data-id="${user.id}">
                         Make Admin
                     </button>`
+
                     :
+
                     `<button
                         class="demote-user-btn"
                         data-id="${user.id}">
@@ -499,52 +755,75 @@ function displayUsers(users) {
             </div>
         `;
 
+
         userList.appendChild(card);
+
     });
 
 
     document
-        .querySelectorAll(".promote-user-btn")
+        .querySelectorAll(
+            ".promote-user-btn"
+        )
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                changeUserRole(
-                    button.dataset.id,
-                    "admin"
-                );
+                    changeUserRole(
+                        button.dataset.id,
+                        "admin"
+                    );
 
-            });
+                }
+            );
 
         });
 
 
     document
-        .querySelectorAll(".demote-user-btn")
+        .querySelectorAll(
+            ".demote-user-btn"
+        )
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                changeUserRole(
-                    button.dataset.id,
-                    "student"
-                );
+                    changeUserRole(
+                        button.dataset.id,
+                        "student"
+                    );
 
-            });
+                }
+            );
 
         });
 }
 
 
-async function changeUserRole(userId, role) {
+// =========================
+// CHANGE USER ROLE
+// =========================
+
+async function changeUserRole(
+    userId,
+    role
+) {
 
     const action =
         role === "admin"
-        ? "promote this user to admin"
-        : "remove admin access from this user";
+            ? "promote this user to admin"
+            : "remove admin access from this user";
+
 
     const confirmed =
-        confirm(`Are you sure you want to ${action}?`);
+        confirm(
+            `Are you sure you want to ${action}?`
+        );
+
 
     if (!confirmed) {
         return;
@@ -560,12 +839,14 @@ async function changeUserRole(userId, role) {
                     method: "PATCH",
 
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type":
+                            "application/json"
                     },
 
-                    body: JSON.stringify({
-                        role
-                    })
+                    body:
+                        JSON.stringify({
+                            role
+                        })
                 }
             );
 
@@ -576,26 +857,119 @@ async function changeUserRole(userId, role) {
 
         if (!response.ok) {
 
-            alert(
+            showToast(
                 data.message ||
-                "Failed to change user role."
+                "Failed to change user role.",
+                "error"
             );
 
             return;
         }
 
 
-        alert(data.message);
+        showToast(
+            data.message ||
+            "User role updated.",
+            "success"
+        );
 
-        loadUsers();
+
+        await loadUsers();
 
 
     } catch (error) {
 
         console.error(error);
 
-        alert(
-            "Something went wrong."
+        showToast(
+            "Something went wrong.",
+            "error"
         );
     }
 }
+
+
+// =========================
+// DASHBOARD STATS
+// =========================
+
+function updateDashboardStats() {
+
+    const usersElement =
+        document.getElementById(
+            "total-users"
+        );
+
+    const eventsElement =
+        document.getElementById(
+            "total-events"
+        );
+
+    if (usersElement) {
+
+        usersElement.textContent =
+            allUsers.length;
+    }
+
+
+    if (eventsElement) {
+
+        eventsElement.textContent =
+            allEvents.length;
+    }
+}
+
+
+// =========================
+// LOGOUT
+// =========================
+
+logoutButton.addEventListener(
+    "click",
+    async event => {
+
+        event.preventDefault();
+
+
+        try {
+
+            await fetch(
+                "/api/auth/logout",
+                {
+                    method: "POST"
+                }
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+
+        window.location.href =
+            "/login.html";
+    }
+);
+
+
+// =========================
+// INITIALIZE
+// =========================
+
+(async () => {
+
+    const isAdmin =
+        await checkAdmin();
+
+
+    if (isAdmin) {
+
+        await Promise.all([
+            loadEvents(),
+            loadUsers()
+        ]);
+
+    }
+
+})();
