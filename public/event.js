@@ -141,10 +141,10 @@ async function loadEvent() {
                 🕐 <strong>Time:</strong>
 ${formatTime(event.time)}            </p>
 
-            <p>
-                👥 <strong>Capacity:</strong>
-                ${event.capacity}
-            </p>
+           <p>
+    👥 <strong>Capacity:</strong>
+    ${event.capacity ?? "Unlimited"}
+</p>
 
             <p>
                 🎟️ <strong>Registered:</strong>

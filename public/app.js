@@ -216,8 +216,7 @@ function displayEvents(events) {
             <p>📅 ${event.date}</p>
 
 <p>🕐 ${formatTime(event.time)}</p>
-            <p>👥 Capacity: ${event.capacity}</p>
-        `;
+<p>👥 Capacity: ${event.capacity ?? "Unlimited"}</p>        `;
 
         eventList.appendChild(card);
     });
