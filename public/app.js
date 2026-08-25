@@ -124,6 +124,23 @@ async function loadEvents() {
     }
 }
 
+function formatTime(time) {
+
+    if (!time) {
+        return "";
+    }
+
+    const [hours, minutes] =
+    time.split(":").map(Number);
+
+    const period =
+        hours >= 12 ? "PM" : "AM";
+
+    const displayHour =
+        hours % 12 || 12;
+
+    return `${displayHour}:${String(minutes).padStart(2, "0")} ${period}`;
+}
 
 function displayEvents(events) {
 
@@ -198,8 +215,7 @@ function displayEvents(events) {
 
             <p>📅 ${event.date}</p>
 
-            <p>🕐 ${event.time}</p>
-
+<p>🕐 ${formatTime(event.time)}</p>
             <p>👥 Capacity: ${event.capacity}</p>
         `;
 

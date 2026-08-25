@@ -13,7 +13,23 @@ const registerButton =
 const registrationMessage =
     document.getElementById("registration-message");
 
+function formatTime(time) {
 
+    if (!time) {
+        return "";
+    }
+
+    const [hours, minutes] =
+    time.split(":").map(Number);
+
+    const period =
+        hours >= 12 ? "PM" : "AM";
+
+    const displayHour =
+        hours % 12 || 12;
+
+    return `${displayHour}:${String(minutes).padStart(2, "0")} ${period}`;
+}
 async function setupAuthUI() {
 
     const user = await getCurrentUser();
@@ -123,8 +139,7 @@ async function loadEvent() {
 
             <p>
                 🕐 <strong>Time:</strong>
-                ${event.time}
-            </p>
+${formatTime(event.time)}            </p>
 
             <p>
                 👥 <strong>Capacity:</strong>

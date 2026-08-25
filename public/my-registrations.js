@@ -1,7 +1,23 @@
 const registrationsContainer =
     document.getElementById("my-registrations");
 
+function formatTime(time) {
 
+    if (!time) {
+        return "";
+    }
+
+    const [hours, minutes] =
+    time.split(":").map(Number);
+
+    const period =
+        hours >= 12 ? "PM" : "AM";
+
+    const displayHour =
+        hours % 12 || 12;
+
+    return `${displayHour}:${String(minutes).padStart(2, "0")} ${period}`;
+}
 async function setupAuthUI() {
 
     const user = await getCurrentUser();
@@ -114,8 +130,7 @@ async function loadRegistrations() {
 
                 <p>📅 ${registration.date}</p>
 
-                <p>🕐 ${registration.time}</p>
-
+<p>🕐 ${formatTime(registration.time)}</p>
                 <p>
                     Registered on:
                     ${new Date(
