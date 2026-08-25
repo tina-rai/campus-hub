@@ -331,7 +331,6 @@ eventForm.addEventListener(
 
         event.preventDefault();
 
-
         const submitButton =
             eventForm.querySelector(
                 "button[type='submit']"
@@ -343,6 +342,59 @@ eventForm.addEventListener(
             "Creating...";
 
 
+        // =========================
+        // GET EVENT TIME
+        // =========================
+
+        const hour =
+            document.getElementById("event-hour").value;
+
+        const minute =
+            document.getElementById("event-minute").value;
+
+        const period =
+            document.getElementById("event-period").value;
+
+
+        if (!hour || !minute || !period) {
+
+            showToast(
+                "Please select a valid event time.",
+                "error"
+            );
+
+            submitButton.disabled = false;
+
+            submitButton.textContent =
+                "Create Event";
+
+            return;
+        }
+
+
+        // Convert 12-hour time to 24-hour time
+
+        let hour24 =
+            Number(hour);
+
+        if (period === "AM" && hour24 === 12) {
+            hour24 = 0;
+        }
+
+        if (period === "PM" && hour24 !== 12) {
+            hour24 += 12;
+        }
+
+
+        const eventTime =
+            `${String(hour24).padStart(2, "0")}:${minute}`;
+
+
+        // =========================
+        // EVENT DATA
+        // =========================
+        const capacityValue =
+            document.getElementById("capacity").value;
         const eventData = {
 
             title: document
@@ -368,17 +420,17 @@ eventForm.addEventListener(
                 .getElementById("date")
                 .value,
 
-            time: document
-                .getElementById("time")
-                .value,
+            time: eventTime,
 
-            capacity: Number(
-                document
-                .getElementById("capacity")
-                .value
-            )
+            capacity: capacityValue ?
+                Number(capacityValue) :
+                null
         };
 
+
+        // =========================
+        // CREATE EVENT
+        // =========================
 
         try {
 
@@ -442,8 +494,6 @@ eventForm.addEventListener(
 
     }
 );
-
-
 // =========================
 // DELETE EVENT
 // =========================

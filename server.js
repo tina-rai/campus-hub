@@ -551,7 +551,11 @@ app.put("/events/:id", requireAdmin, async(req, res) => {
         !location ||
         !date ||
         !time ||
-        !capacity
+        (
+            capacity !== null &&
+            capacity !== undefined &&
+            Number(capacity) < 1
+        )
     ) {
         return res.status(400).json({
             message: "All event fields are required"
@@ -659,7 +663,11 @@ app.post("/events", requireAdmin, async(req, res) => {
         !location ||
         !date ||
         !time ||
-        !capacity
+        (
+            capacity !== null &&
+            capacity !== undefined &&
+            Number(capacity) < 1
+        )
     ) {
         return res.status(400).json({
             message: "All event fields are required"
