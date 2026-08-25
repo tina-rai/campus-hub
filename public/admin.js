@@ -1,6 +1,7 @@
 const eventForm =
     document.getElementById("event-form");
-
+    const eventMessage =
+    document.getElementById("event-message");
 const eventList =
     document.getElementById("admin-event-list");
 
@@ -9,6 +10,10 @@ const userList =
 
 const logoutButton =
     document.getElementById("logout-btn");
+    const submitButton =
+    document.getElementById("event-submit-btn");
+    const cancelEditButton =
+    document.getElementById("cancel-edit-btn");
 
 const toast =
     document.getElementById("toast");
@@ -21,6 +26,8 @@ const quickActionButtons =
 
 let currentUserId = null;
 let toastTimer = null;
+let editingEventId = null;
+
 let allEvents = [];
 let allUsers = [];
 
@@ -106,7 +113,6 @@ quickActionButtons.forEach(button => {
 
 });
 
-
 // =========================
 // ADMIN CHECK
 // =========================
@@ -121,7 +127,8 @@ async function checkAdmin() {
         const data =
             await response.json();
 
-        if (!response.ok ||
+        if (
+            !response.ok ||
             !data.user ||
             data.user.role !== "admin"
         ) {
@@ -150,6 +157,66 @@ async function checkAdmin() {
 
 
 // =========================
+// TIME HELPERS
+// =========================
+
+function convertTo24Hour(hour, minute, period) {
+
+    let hour24 =
+        Number(hour);
+
+    if (
+        period === "AM" &&
+        hour24 === 12
+    ) {
+        hour24 = 0;
+    }
+
+    if (
+        period === "PM" &&
+        hour24 !== 12
+    ) {
+        hour24 += 12;
+    }
+
+    return `${String(hour24).padStart(2, "0")}:${minute}`;
+}
+
+
+function parseTime(time) {
+
+    if (!time) {
+        return null;
+    }
+
+    const [
+        hourString,
+        minuteString
+    ] = time.split(":");
+
+    let hour =
+        Number(hourString);
+
+    const minute =
+        minuteString;
+
+    const period =
+        hour >= 12
+            ? "PM"
+            : "AM";
+
+    hour =
+        hour % 12 || 12;
+
+    return {
+        hour: String(hour).padStart(2, "0"),
+        minute,
+        period
+    };
+}
+
+
+// =========================
 // LOAD EVENTS
 // =========================
 
@@ -166,20 +233,14 @@ async function loadEvents() {
         if (!response.ok) {
 
             eventList.innerHTML =
-                `<p>${
-                    data.message ||
-                    "Failed to load events."
-                }</p>`;
+                `<p>${data.message || "Failed to load events."}</p>`;
 
             return;
         }
 
-        allEvents =
-            data.results || data;
-
-        displayEvents(allEvents);
-
-        updateDashboardStats();
+        displayEvents(
+            data.results || data
+        );
 
     } catch (error) {
 
@@ -207,7 +268,6 @@ function displayEvents(events) {
         return;
     }
 
-
     events.forEach(event => {
 
         const card =
@@ -216,71 +276,118 @@ function displayEvents(events) {
         card.className =
             "admin-event-card";
 
+        const capacity =
+            event.capacity === null
+                ? "Unlimited"
+                : event.capacity;
+
+        const registrationLink =
+            event.registration_link;
 
         card.innerHTML = `
 
-            <div class="admin-event-info">
+            <span class="event-category">
+                ${event.category}
+            </span>
 
-                <span class="event-category">
-                    ${event.category}
-                </span>
+            <h3>
+                ${event.title}
+            </h3>
 
-                <h3>
-                    ${event.title}
-                </h3>
+            <p>
+                ${event.description}
+            </p>
 
-                <p>
-                    ${event.description}
+            <p>
+                📍 ${event.location}
+            </p>
+
+            <p>
+                📅 ${event.date}
+            </p>
+
+            <p>
+                🕐 ${formatDisplayTime(event.time)}
+            </p>
+
+            <p>
+                👥 Capacity: ${capacity}
+            </p>
+
+            ${
+                registrationLink
+                ?
+                `
+                <p class="external-registration-status">
+                    🔗 External registration form added
                 </p>
-
-                <p>
-                    📍 ${event.location}
-                </p>
-
-                <p>
-                    📅 ${event.date}
-                </p>
-
-                <p>
-                    🕐 ${event.time}
-                </p>
-
-                <p>
-                    👥 Capacity: ${event.capacity}
-                </p>
-
-            </div>
-
+                `
+                :
+                ""
+            }
 
             <div class="admin-actions">
 
                 <button
+                    class="edit-event-btn"
+                    data-id="${event.id}"
+                >
+                    Edit
+                </button>
+
+                <button
                     class="view-registrations-btn"
-                    data-id="${event.id}">
+                    data-id="${event.id}"
+                >
                     View Registrations
                 </button>
 
                 <button
                     class="delete-event-btn"
-                    data-id="${event.id}">
+                    data-id="${event.id}"
+                >
                     Delete
                 </button>
 
             </div>
 
-
             <div
                 class="registrations"
-                id="registrations-${event.id}">
-            </div>
-
+                id="registrations-${event.id}"
+            ></div>
         `;
 
-
         eventList.appendChild(card);
-
     });
 
+
+    // Edit buttons
+
+    document
+        .querySelectorAll(".edit-event-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const event =
+                        events.find(
+                            item =>
+                                String(item.id) ===
+                                String(button.dataset.id)
+                        );
+
+                    if (event) {
+                        startEditingEvent(event);
+                    }
+                }
+            );
+
+        });
+
+
+    // Delete buttons
 
     document
         .querySelectorAll(".delete-event-btn")
@@ -293,17 +400,16 @@ function displayEvents(events) {
                     deleteEvent(
                         button.dataset.id
                     );
-
                 }
             );
 
         });
 
 
+    // Registration buttons
+
     document
-        .querySelectorAll(
-            ".view-registrations-btn"
-        )
+        .querySelectorAll(".view-registrations-btn")
         .forEach(button => {
 
             button.addEventListener(
@@ -313,16 +419,139 @@ function displayEvents(events) {
                     loadRegistrations(
                         button.dataset.id
                     );
-
                 }
             );
 
         });
+
 }
 
 
 // =========================
-// CREATE EVENT
+// FORMAT DISPLAY TIME
+// =========================
+
+function formatDisplayTime(time) {
+
+    if (!time) {
+        return "";
+    }
+
+    const [
+        hours,
+        minutes
+    ] = time
+        .split(":")
+        .map(Number);
+
+    const period =
+        hours >= 12
+            ? "PM"
+            : "AM";
+
+    const displayHour =
+        hours % 12 || 12;
+
+    return `${displayHour}:${String(minutes).padStart(2, "0")} ${period}`;
+}
+
+
+// =========================
+// START EDITING
+// =========================
+
+function startEditingEvent(event) {
+
+    editingEventId =
+        event.id;
+
+    document.getElementById("title").value =
+        event.title;
+
+    document.getElementById("description").value =
+        event.description;
+
+    document.getElementById("category").value =
+        event.category;
+
+    document.getElementById("location").value =
+        event.location;
+
+    document.getElementById("date").value =
+        event.date;
+
+    document.getElementById("capacity").value =
+        event.capacity ?? "";
+
+    document.getElementById("registration-link").value =
+        event.registration_link ?? "";
+
+
+    const parsedTime =
+        parseTime(event.time);
+
+    if (parsedTime) {
+
+        document.getElementById("event-hour").value =
+            parsedTime.hour;
+
+        document.getElementById("event-minute").value =
+            parsedTime.minute;
+
+        document.getElementById("event-period").value =
+            parsedTime.period;
+    }
+
+
+    submitButton.textContent =
+        "Save Changes";
+
+    cancelEditButton.hidden =
+        false;
+
+    eventMessage.textContent =
+        `Editing "${event.title}"`;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+// =========================
+// CANCEL EDIT
+// =========================
+
+cancelEditButton.addEventListener(
+    "click",
+    () => {
+
+        resetEventForm();
+
+    }
+);
+
+
+function resetEventForm() {
+
+    editingEventId =
+        null;
+
+    eventForm.reset();
+
+    submitButton.textContent =
+        "Create Event";
+
+    cancelEditButton.hidden =
+        true;
+
+    eventMessage.textContent = "";
+}
+
+
+// =========================
+// CREATE / UPDATE EVENT
 // =========================
 
 eventForm.addEventListener(
@@ -331,120 +560,146 @@ eventForm.addEventListener(
 
         event.preventDefault();
 
-        const submitButton =
-            eventForm.querySelector(
-                "button[type='submit']"
-            );
 
-        submitButton.disabled = true;
+        submitButton.disabled =
+            true;
 
         submitButton.textContent =
-            "Creating...";
+            editingEventId
+                ? "Saving..."
+                : "Creating...";
 
-
-        // =========================
-        // GET EVENT TIME
-        // =========================
 
         const hour =
-            document.getElementById("event-hour").value;
+            document.getElementById(
+                "event-hour"
+            ).value;
 
         const minute =
-            document.getElementById("event-minute").value;
+            document.getElementById(
+                "event-minute"
+            ).value;
 
         const period =
-            document.getElementById("event-period").value;
+            document.getElementById(
+                "event-period"
+            ).value;
 
 
-        if (!hour || !minute || !period) {
+        if (
+            !hour ||
+            !minute ||
+            !period
+        ) {
 
             showToast(
                 "Please select a valid event time.",
                 "error"
             );
 
-            submitButton.disabled = false;
+            submitButton.disabled =
+                false;
 
             submitButton.textContent =
-                "Create Event";
+                editingEventId
+                    ? "Save Changes"
+                    : "Create Event";
 
             return;
         }
 
 
-        // Convert 12-hour time to 24-hour time
-
-        let hour24 =
-            Number(hour);
-
-        if (period === "AM" && hour24 === 12) {
-            hour24 = 0;
-        }
-
-        if (period === "PM" && hour24 !== 12) {
-            hour24 += 12;
-        }
-
-
         const eventTime =
-            `${String(hour24).padStart(2, "0")}:${minute}`;
+            convertTo24Hour(
+                hour,
+                minute,
+                period
+            );
 
 
-        // =========================
-        // EVENT DATA
-        // =========================
         const capacityValue =
-            document.getElementById("capacity").value;
+            document.getElementById(
+                "capacity"
+            ).value.trim();
+
+
+        const registrationLink =
+            document.getElementById(
+                "registration-link"
+            ).value.trim();
+
+
         const eventData = {
 
-            title: document
-                .getElementById("title")
-                .value
-                .trim(),
+            title:
+                document
+                    .getElementById("title")
+                    .value
+                    .trim(),
 
-            description: document
-                .getElementById("description")
-                .value
-                .trim(),
+            description:
+                document
+                    .getElementById("description")
+                    .value
+                    .trim(),
 
-            category: document
-                .getElementById("category")
-                .value,
+            category:
+                document
+                    .getElementById("category")
+                    .value,
 
-            location: document
-                .getElementById("location")
-                .value
-                .trim(),
+            location:
+                document
+                    .getElementById("location")
+                    .value
+                    .trim(),
 
-            date: document
-                .getElementById("date")
-                .value,
+            date:
+                document
+                    .getElementById("date")
+                    .value,
 
-            time: eventTime,
+            time:
+                eventTime,
 
-            capacity: capacityValue ?
-                Number(capacityValue) :
-                null
+            capacity:
+                capacityValue
+                    ? Number(capacityValue)
+                    : null,
+
+            registration_link:
+                registrationLink || null
         };
 
 
-        // =========================
-        // CREATE EVENT
-        // =========================
-
         try {
 
-            const response =
-                await fetch("/events", {
+            const url =
+                editingEventId
+                    ? `/events/${editingEventId}`
+                    : "/events";
 
-                    method: "POST",
+
+            const method =
+                editingEventId
+                    ? "PUT"
+                    : "POST";
+
+
+            const response =
+                await fetch(url, {
+
+                    method,
 
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type":
+                            "application/json"
                     },
 
-                    body: JSON.stringify(eventData)
-
+                    body:
+                        JSON.stringify(
+                            eventData
+                        )
                 });
 
 
@@ -456,7 +711,7 @@ eventForm.addEventListener(
 
                 showToast(
                     data.message ||
-                    "Failed to create event.",
+                    "Failed to save event.",
                     "error"
                 );
 
@@ -464,10 +719,13 @@ eventForm.addEventListener(
             }
 
 
-            eventForm.reset();
+            resetEventForm();
+
 
             showToast(
-                "Event created successfully!",
+                editingEventId
+                    ? "Event updated successfully!"
+                    : "Event created successfully!",
                 "success"
             );
 
@@ -486,59 +744,46 @@ eventForm.addEventListener(
 
         } finally {
 
-            submitButton.disabled = false;
+            submitButton.disabled =
+                false;
 
-            submitButton.textContent =
-                "Create Event";
+            if (editingEventId) {
+                submitButton.textContent =
+                    "Save Changes";
+            }
         }
 
     }
 );
+
+
 // =========================
 // DELETE EVENT
 // =========================
 
 async function deleteEvent(eventId) {
 
-    const event =
-        allEvents.find(
-            item =>
-            String(item.id) ===
-            String(eventId)
-        );
-
-
-    const eventName =
-        event ?
-        event.title :
-        "this event";
-
-
     const confirmed =
         confirm(
-            `Delete "${eventName}"?\n\n` +
-            `This action cannot be undone.`
+            "Are you sure you want to delete this event?"
         );
-
 
     if (!confirmed) {
         return;
     }
 
-
     try {
 
         const response =
             await fetch(
-                `/events/${eventId}`, {
+                `/events/${eventId}`,
+                {
                     method: "DELETE"
                 }
             );
 
-
         const data =
             await response.json();
-
 
         if (!response.ok) {
 
@@ -551,15 +796,12 @@ async function deleteEvent(eventId) {
             return;
         }
 
-
         showToast(
-            "Event deleted successfully!",
+            "Event deleted successfully.",
             "success"
         );
 
-
         await loadEvents();
-
 
     } catch (error) {
 

@@ -424,8 +424,10 @@ app.get("/events/:id", async(req, res) => {
         const registered =
             Number(registrationResult.rows[0].registered);
 
-        const remaining =
-            event.capacity - registered;
+            const remaining =
+            event.capacity === null
+                ? null
+                : event.capacity - registered;
 
         res.json({
             ...event,
@@ -542,23 +544,43 @@ app.put("/events/:id", requireAdmin, async(req, res) => {
         location,
         date,
         time,
-        capacity
+        capacity,
+        registration_link
     } = req.body;
 
+    // Validate required fields
     if (!title ||
         !description ||
         !category ||
         !location ||
         !date ||
-        !time ||
-        (
-            capacity !== null &&
-            capacity !== undefined &&
+        !time
+    ) {
+        return res.status(400).json({
+            message: "Please fill in all required event fields"
+        });
+    }
+
+    // Validate optional capacity
+    if (
+        capacity !== null &&
+        capacity !== undefined &&
+        (!Number.isInteger(Number(capacity)) ||
             Number(capacity) < 1
         )
     ) {
         return res.status(400).json({
-            message: "All event fields are required"
+            message: "Capacity must be a positive whole number or left empty"
+        });
+    }
+
+    // Validate optional registration link
+    if (
+        registration_link &&
+        !/^https?:\/\/.+/i.test(registration_link)
+    ) {
+        return res.status(400).json({
+            message: "Registration link must be a valid URL"
         });
     }
 
@@ -566,22 +588,25 @@ app.put("/events/:id", requireAdmin, async(req, res) => {
 
         const result = await db.query(
             `UPDATE events
-             SET title = $1,
-                 description = $2,
-                 category = $3,
-                 location = $4,
-                 date = $5,
-                 time = $6,
-                 capacity = $7
-             WHERE id = $8
+             SET
+                title = $1,
+                description = $2,
+                category = $3,
+                location = $4,
+                date = $5,
+                time = $6,
+                capacity = $7,
+                registration_link = $8
+             WHERE id = $9
              RETURNING *`, [
-                title,
-                description,
+                title.trim(),
+                description.trim(),
                 category,
-                location,
+                location.trim(),
                 date,
                 time,
-                capacity,
+                capacity ?? null,
+                registration_link ?.trim() || null,
                 id
             ]
         );
@@ -592,14 +617,17 @@ app.put("/events/:id", requireAdmin, async(req, res) => {
             });
         }
 
-        res.json(result.rows[0]);
+        res.json({
+            message: "Event updated successfully",
+            event: result.rows[0]
+        });
 
     } catch (err) {
 
-        console.error(err);
+        console.error("Update event error:", err);
 
         res.status(500).json({
-            error: err.message
+            message: "Failed to update event"
         });
 
     }

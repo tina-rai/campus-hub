@@ -186,44 +186,48 @@
 
                 <form id="event-form" class="admin-form">
 
-                    <input type="text" id="title" placeholder="Event title" required>
-
-                    <textarea id="description" placeholder="Event description" required></textarea>
-
+                    <input
+                        type="text"
+                        id="title"
+                        placeholder="Event title"
+                        required
+                    >
+                
+                    <textarea
+                        id="description"
+                        placeholder="Event description"
+                        required
+                    ></textarea>
+                
                     <select id="category" required>
-
-                        <option value="">
-                            Select category
-                        </option>
-
-                        <option value="Workshop">
-                            Workshop
-                        </option>
-
-                        <option value="Competition">
-                            Competition
-                        </option>
-
-                        <option value="Seminar">
-                            Seminar
-                        </option>
-
-                        <option value="Club">
-                            Club
-                        </option>
-
+                        <option value="">Select category</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Competition">Competition</option>
+                        <option value="Seminar">Seminar</option>
+                        <option value="Club">Club</option>
                     </select>
-
-                    <input type="text" id="location" placeholder="Location" required>
-
-                    <input type="date" id="date" required>
-
+                
+                    <input
+                        type="text"
+                        id="location"
+                        placeholder="Location"
+                        required
+                    >
+                
+                    <input
+                        type="date"
+                        id="date"
+                        required
+                    >
+                
                     <div class="time-input-group">
-
-                        <label for="event-hour">Time</label>
-
+                
+                        <label for="event-hour">
+                            Time
+                        </label>
+                
                         <div class="time-input-row">
-
+                
                             <select id="event-hour" required>
                                 <option value="">Hour</option>
                                 <option value="01">01</option>
@@ -239,9 +243,9 @@
                                 <option value="11">11</option>
                                 <option value="12">12</option>
                             </select>
-
+                
                             <span>:</span>
-
+                
                             <select id="event-minute" required>
                                 <option value="">Minute</option>
                                 <option value="00">00</option>
@@ -257,23 +261,54 @@
                                 <option value="50">50</option>
                                 <option value="55">55</option>
                             </select>
-
+                
                             <select id="event-period" required>
                                 <option value="">AM/PM</option>
                                 <option value="AM">AM</option>
                                 <option value="PM">PM</option>
                             </select>
-
+                
                         </div>
-
+                
                     </div>
-                    <input type="number" id="capacity" placeholder="Capacity (optional)" min="1">
-                    <button type="submit">
-                        Create Event
-                    </button>
-
+                
+                    <input
+                        type="number"
+                        id="capacity"
+                        placeholder="Capacity (optional)"
+                        min="1"
+                    >
+                
+                    <input
+                        type="url"
+                        id="registration-link"
+                        placeholder="Registration form link (optional)"
+                    >
+                
+                    <small class="form-help">
+                        Add a Google Form or other external registration link if needed.
+                    </small>
+                
+                    <div class="form-actions">
+                
+                        <button type="submit" id="event-submit-btn">
+                            Create Event
+                        </button>
+                
+                        <button
+                            type="button"
+                            id="cancel-edit-btn"
+                            class="secondary-button"
+                            hidden
+                        >
+                            Cancel Edit
+                        </button>
+                
+                    </div>
+                
+                    <p id="event-message"></p>
+                
                 </form>
-
             </div>
 
 
