@@ -230,19 +230,20 @@ async function loadEvents() {
         const data =
             await response.json();
 
-        if (!response.ok) {
+            if (!response.ok) {
+                eventList.innerHTML =
+                    `<p>${data.message || "Failed to load events."}`;
+            
+                return;
+            }
+            
+            allEvents = data.results || data;
+            
+            displayEvents(allEvents);
+            
+            updateDashboardStats();
 
-            eventList.innerHTML =
-                `<p>${data.message || "Failed to load events."}</p>`;
-
-            return;
-        }
-
-        displayEvents(
-            data.results || data
-        );
-
-    } catch (error) {
+         } catch (error) {
 
         console.error(error);
 
@@ -298,21 +299,10 @@ function displayEvents(events) {
                 ${event.description}
             </p>
 
-            <p>
-                📍 ${event.location}
-            </p>
-
-            <p>
-                📅 ${event.date}
-            </p>
-
-            <p>
-                🕐 ${formatDisplayTime(event.time)}
-            </p>
-
-            <p>
-                👥 Capacity: ${capacity}
-            </p>
+            <strong>Location:</strong> ${event.location}
+<strong>Date:</strong> ${event.date}
+<strong>Time:</strong> ${formatDisplayTime(event.time)}
+<strong>Capacity:</strong> ${capacity}
 
             ${
                 registrationLink
@@ -943,14 +933,12 @@ async function loadUsers() {
             return;
         }
 
+        displayUsers(data.users);
+        allUsers = data.users;
 
-        allUsers =
-            data.users || [];
+displayUsers(allUsers);
 
-        displayUsers(allUsers);
-
-        updateDashboardStats();
-
+updateDashboardStats();
 
     } catch (error) {
 

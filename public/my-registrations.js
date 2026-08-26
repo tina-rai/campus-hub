@@ -125,13 +125,11 @@ async function loadRegistrations() {
                     <strong>Category:</strong>
                     ${registration.category}
                 </p>
+<p><strong>Location:</strong> ${registration.location}</p>
 
-                <p>📍 ${registration.location}</p>
+<p><strong>Date:</strong> ${registration.date}</p>
 
-                <p>📅 ${registration.date}</p>
-
-<p>🕐 ${formatTime(registration.time)}</p>
-                <p>
+<p><strong>Time:</strong> ${formatTime(registration.time)}</p>
                     Registered on:
                     ${new Date(
                         registration.registered_at

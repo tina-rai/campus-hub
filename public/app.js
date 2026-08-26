@@ -211,12 +211,10 @@ function displayEvents(events) {
 
             <p>${event.description}</p>
 
-            <p>📍 ${event.location}</p>
-
-            <p>📅 ${event.date}</p>
-
-<p>🕐 ${formatTime(event.time)}</p>
-<p>👥 Capacity: ${event.capacity ?? "Unlimited"}</p>        `;
+           <p><strong>Location:</strong> ${event.location}</p>
+<p><strong>Date:</strong> ${event.date}</p>
+<p><strong>Time:</strong> ${formatTime(event.time)}</p>
+<p><strong>Capacity:</strong> ${event.capacity ?? "Unlimited"}</p>        `;
 
         eventList.appendChild(card);
     });

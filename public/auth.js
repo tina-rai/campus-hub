@@ -141,11 +141,11 @@ document.querySelectorAll(".toggle-password").forEach((button) => {
 
         if (input.type === "password") {
             input.type = "text";
-            button.textContent = "🙈";
+            button.textContent = "Hide";
             button.setAttribute("aria-label", "Hide password");
         } else {
             input.type = "password";
-            button.textContent = "👁";
+            button.textContent = "Show";
             button.setAttribute("aria-label", "Show password");
         }
     });

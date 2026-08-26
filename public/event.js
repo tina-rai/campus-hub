@@ -127,32 +127,32 @@ async function loadEvent() {
 
             <p>${event.description}</p>
 
-            <p>
-                📍 <strong>Location:</strong>
-                ${event.location}
-            </p>
-
-            <p>
-                📅 <strong>Date:</strong>
-                ${event.date}
-            </p>
-
-            <p>
-                🕐 <strong>Time:</strong>
-${formatTime(event.time)}            </p>
-
            <p>
-    👥 <strong>Capacity:</strong>
-    ${event.capacity ?? "Unlimited"}
+    <strong>Location:</strong>
+    ${event.location}
 </p>
 
+<p>
+    <strong>Date:</strong>
+    ${event.date}
+</p>
+
+<p>
+    <strong>Time:</strong>
+    ${formatTime(event.time)}
+</p>
+
+<p>
+    <strong>Capacity:</strong>
+    ${event.capacity ?? "Unlimited"}
+</p>
             <p>
-                🎟️ <strong>Registered:</strong>
+                 <strong>Registered:</strong>
                 ${event.registered}
             </p>
 
             <p>
-                🪑 <strong>Seats remaining:</strong>
+                 <strong>Seats remaining:</strong>
                 ${event.remaining}
             </p>
 

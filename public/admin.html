@@ -8,6 +8,21 @@
     <title>Admin Dashboard | CampusHub</title>
 
     <link rel="stylesheet" href="style.css">
+    <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+>
+
+<link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+>
 </head>
 
 <body>
@@ -32,19 +47,19 @@
             <nav class="admin-nav">
 
                 <button class="admin-nav-btn active" data-section="dashboard-section">
-                    📊 Dashboard
+                     Dashboard
                 </button>
 
                 <button class="admin-nav-btn" data-section="users-section">
-                    👥 Users
+                     Users
                 </button>
 
                 <button class="admin-nav-btn" data-section="events-section">
-                    📅 Events
+                     Events
                 </button>
 
                 <button class="admin-nav-btn" data-section="registrations-section">
-                    🎟️ Registrations
+                    Registrations
                 </button>
 
             </nav>
@@ -73,50 +88,50 @@
             </div>
 
 
-            <div class="admin-stats">
+            <div class="dashboard-stats">
 
-                <div class="admin-stat-card">
-
-                    <span class="admin-stat-icon">
-                        👥
-                    </span>
-
-                    <div>
-                        <span class="admin-stat-label">
-                            Total Users
-                        </span>
-
-                        <strong id="total-users">
-                            —
-                        </strong>
+                <a
+                    href="#user-management-section"
+                    class="dashboard-stat"
+                >
+                    <div class="stat-label">
+                        Total Users
                     </div>
-
-                </div>
-
-
-                <div class="admin-stat-card">
-
-                    <span class="admin-stat-icon">
-                        📅
-                    </span>
-
-                    <div>
-                        <span class="admin-stat-label">
-                            Total Events
-                        </span>
-
-                        <strong id="total-events">
-                            —
-                        </strong>
+            
+                    <div
+                        class="stat-number"
+                        id="total-users"
+                    >
+                        0
                     </div>
-
-                </div>
-
+            
+                    <div class="stat-link">
+                        View users →
+                    </div>
+                </a>
+            
+            
+                <a
+                    href="#event-management-section"
+                    class="dashboard-stat"
+                >
+                    <div class="stat-label">
+                        Total Events
+                    </div>
+            
+                    <div
+                        class="stat-number"
+                        id="total-events"
+                    >
+                        0
+                    </div>
+            
+                    <div class="stat-link">
+                        View events →
+                    </div>
+                </a>
+            
             </div>
-
-            </div>
-
-
             <div class="admin-dashboard-card">
 
                 <h3>Quick Actions</h3>
@@ -124,11 +139,11 @@
                 <div class="quick-actions">
 
                     <button class="quick-action-btn" data-section="events-section">
-                        ➕ Create Event
+                         Create Event
                     </button>
 
                     <button class="quick-action-btn" data-section="users-section">
-                        👥 Manage Users
+                        Manage Users
                     </button>
 
                 </div>
@@ -141,16 +156,12 @@
 
         <!-- USERS -->
 
-        <section id="users-section" class="admin-page-section">
+        <section id="user-management-section" class="admin-section">
 
             <div class="admin-section-heading">
-
+        
                 <div>
                     <h2>Manage Users</h2>
-
-                    <p>
-                        Promote trusted users to admin or remove admin access.
-                    </p>
                 </div>
 
             </div>
@@ -165,8 +176,7 @@
 
         <!-- EVENTS -->
 
-        <section id="events-section" class="admin-page-section">
-
+        <section id="event-management-section" class="admin-section">
             <div class="admin-section-heading">
 
                 <div>
@@ -272,17 +282,27 @@
                 
                     </div>
                 
+                    <label for="capacity">
+                        Capacity
+                        <span class="optional-label">(optional)</span>
+                    </label>
+                    
                     <input
                         type="number"
                         id="capacity"
-                        placeholder="Capacity (optional)"
+                        placeholder="Leave empty for unlimited"
                         min="1"
                     >
                 
+                    <label for="registration-link">
+                        External Registration
+                        <span class="optional-label">(optional)</span>
+                    </label>
+                    
                     <input
                         type="url"
                         id="registration-link"
-                        placeholder="Registration form link (optional)"
+                        placeholder="Paste Google Form or other registration link"
                     >
                 
                     <small class="form-help">
