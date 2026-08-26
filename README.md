@@ -108,6 +108,9 @@ campus-hub/
 ├── package-lock.json
 ├── .gitignore
 └── README.md
+```
+---
+
 
 ## How It Works
 
