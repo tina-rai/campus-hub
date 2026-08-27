@@ -10,7 +10,28 @@ A full-stack campus event management platform where students can discover and re
 https://github.com/tina-rai/campus-hub
 
 ---
+## Screenshots
 
+### Student View
+
+![CampusHub Home](./screenshots/student-dashboard.png)
+
+![Event Details](./screenshots/event-details.png)
+
+### Admin Dashboard
+
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+
+![Manage Users](./screenshots/user-management.png)
+
+![Manage Events](./screenshots/event-management.png)
+
+![Registrations](./screenshots/view-registrations.png)
+
+
+
+
+---
 ## Features
 
 ### Student Features
@@ -102,6 +123,13 @@ campus-hub/
 │   ├── my-registrations.js
 │   ├── signup.html
 │   └── style.css
+│
+├── screenshots/
+│   ├── student-dashboard.png
+│   ├── event-details.png
+│   ├── event-management.png
+│   ├── user-management.png
+│   ├── admin-dashboard.png
 │
 ├── server.js
 ├── package.json
