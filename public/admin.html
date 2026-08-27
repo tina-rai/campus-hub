@@ -50,14 +50,13 @@
                      Dashboard
                 </button>
 
-                <button class="admin-nav-btn" data-section="users-section">
+                <button class="admin-nav-btn" data-section="user-management-section">
                      Users
                 </button>
 
-                <button class="admin-nav-btn" data-section="events-section">
-                     Events
+                <button class="admin-nav-btn" data-section="event-management-section">
+                    Events
                 </button>
-
                 <button class="admin-nav-btn" data-section="registrations-section">
                     Registrations
                 </button>
@@ -138,11 +137,11 @@
 
                 <div class="quick-actions">
 
-                    <button class="quick-action-btn" data-section="events-section">
-                         Create Event
+                    <button class="quick-action-btn" data-section="event-management-section">
+                        Create Event
                     </button>
 
-                    <button class="quick-action-btn" data-section="users-section">
+                    <button class="quick-action-btn" data-section="user-management-section">
                         Manage Users
                     </button>
 
@@ -156,7 +155,7 @@
 
         <!-- USERS -->
 
-        <section id="user-management-section" class="admin-section">
+        <section id="user-management-section" class="admin-page-section">
 
             <div class="admin-section-heading">
         
@@ -176,7 +175,7 @@
 
         <!-- EVENTS -->
 
-        <section id="event-management-section" class="admin-section">
+        <section id="event-management-section" class="admin-page-section">
             <div class="admin-section-heading">
 
                 <div>
@@ -348,34 +347,29 @@
 
         <!-- REGISTRATIONS -->
 
-        <section id="registrations-section" class="admin-page-section">
+<section id="registrations-section" class="admin-page-section">
 
-            <div class="admin-section-heading">
+    <div class="admin-section-heading">
 
-                <div>
-                    <h2>Registrations</h2>
+        <div>
+            <h2>Manage Registrations</h2>
 
-                    <p>
-                        View registrations for your events from the Events section.
-                    </p>
-                </div>
+            <p>
+                View students registered for each campus event.
+            </p>
+        </div>
 
-            </div>
+    </div>
 
-            <div class="admin-dashboard-card">
+    <div class="admin-dashboard-card">
 
-                <p>
-                    Select an event from the
-                    <strong>Events</strong> section to view its registered students.
-                </p>
+        <div id="admin-registration-list">
+            <p>Loading registrations...</p>
+        </div>
 
-                <button class="quick-action-btn" data-section="events-section">
-                    📅 View Events
-                </button>
+    </div>
 
-            </div>
-
-        </section>
+</section>
 
 
     </main>

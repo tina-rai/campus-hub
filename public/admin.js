@@ -24,6 +24,11 @@ const navButtons =
 const quickActionButtons =
     document.querySelectorAll(".quick-action-btn");
 
+const registrationList =
+    document.getElementById(
+        "admin-registration-list"
+    );
+
 let currentUserId = null;
 let toastTimer = null;
 let editingEventId = null;
@@ -92,9 +97,17 @@ navButtons.forEach(button => {
 
     button.addEventListener("click", () => {
 
-        showSection(
-            button.dataset.section
-        );
+        const sectionId =
+            button.dataset.section;
+
+        showSection(sectionId);
+
+        if (
+            sectionId ===
+            "registrations-section"
+        ) {
+            loadAllRegistrations();
+        }
 
     });
 
@@ -1253,3 +1266,181 @@ logoutButton.addEventListener(
     }
 
 })();
+// =========================
+// ADMIN DASHBOARD SECTION
+// =========================
+async function loadAllRegistrations() {
+
+    registrationList.innerHTML =
+        "<p>Loading registrations...</p>";
+
+    try {
+
+        const response =
+            await fetch("/events?limit=100");
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            registrationList.innerHTML =
+                "<p>Failed to load events.</p>";
+
+            return;
+        }
+
+        const events =
+            data.results || data;
+
+        registrationList.innerHTML = "";
+
+        if (!events.length) {
+            registrationList.innerHTML =
+                "<p>No events found.</p>";
+
+            return;
+        }
+
+        events.forEach(event => {
+
+            const eventContainer =
+                document.createElement("div");
+
+            eventContainer.className =
+                "admin-registration-event";
+
+                eventContainer.innerHTML = `
+                <div class="registration-event-header">
+            
+                    <h3>${event.title}</h3>
+            
+                    <span class="registration-count">
+                        Loading...
+                    </span>
+            
+                </div>
+            
+                <div
+                    id="admin-registrations-${event.id}"
+                >
+                    <p>Loading students...</p>
+                </div>
+            `;
+
+            registrationList.appendChild(
+                eventContainer
+            );
+
+            loadEventRegistrations(event.id);
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        registrationList.innerHTML =
+            "<p>Failed to load registrations.</p>";
+    }
+}
+async function loadEventRegistrations(eventId) {
+
+    const container =
+        document.getElementById(
+            `admin-registrations-${eventId}`
+        );
+
+    try {
+
+        const response =
+            await fetch(
+                `/events/${eventId}/registrations`
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            container.innerHTML =
+                `<p>${data.message || "Failed to load registrations."}</p>`;
+
+            return;
+        }
+
+        if (!data.registrations.length) {
+
+            container.innerHTML =
+                "<p>No students registered yet.</p>";
+
+            return;
+        }
+
+        const eventCard =
+        container.closest(
+            ".admin-registration-event"
+        );
+    
+    const countBadge =
+        eventCard.querySelector(
+            ".registration-count"
+        );
+    
+    countBadge.textContent =
+        `${data.count} student${data.count === 1 ? "" : "s"}`;
+        
+    container.innerHTML = "";
+
+        data.registrations.forEach(
+            registration => {
+
+                const student =
+                    document.createElement("div");
+
+                student.className =
+                    "admin-registration";
+
+                student.innerHTML = `
+                    <strong>
+                        ${registration.student_name}
+                    </strong>
+
+                    <span>
+                        ${registration.student_email}
+                    </span>
+                `;
+
+                container.appendChild(student);
+            }
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            "<p>Failed to load registrations.</p>";
+    }
+}
+const dashboardStatCards =
+    document.querySelectorAll(".dashboard-stat");
+
+dashboardStatCards.forEach(card => {
+
+    card.addEventListener("click", event => {
+
+        const targetSection =
+            card.getAttribute("href");
+
+        if (!targetSection) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const sectionId =
+            targetSection.substring(1);
+
+        showSection(sectionId);
+
+    });
+
+});

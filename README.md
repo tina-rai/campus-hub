@@ -112,6 +112,9 @@ campus-hub/
 ---
 
 
+
+---
+
 ## How It Works
 
 CampusHub follows a client-server architecture.

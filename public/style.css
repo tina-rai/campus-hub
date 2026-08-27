@@ -511,6 +511,7 @@ body {
     gap: 10px;
     flex-wrap: wrap;
     margin-top: 18px;
+    
 }
 
 .admin-actions button {
@@ -518,16 +519,16 @@ body {
     border: none;
     border-radius: 7px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 6000;
 }
 
 .view-registrations-btn {
-    background: #2f80ed;
+    background: #1d68e0;
     color: white;
 }
 
 .edit-event-btn {
-    background: #f0ad4e;
+    background: #efb506;
     color: white;
 }
 
@@ -622,18 +623,10 @@ body {
     font-weight: 600;
 }
 
-.view-registrations-btn {
-    background: #2f80ed;
-    color: white;
-}
 
-.delete-event-btn {
-    background: #d9534f;
-    color: white;
-}
 
 .view-registrations-btn:hover {
-    background: #1768d1;
+    background: #063e88;
 }
 
 .delete-event-btn:hover {
@@ -1041,19 +1034,7 @@ body {
     font-weight: 600;
 }
 
-.view-registrations-btn {
-    background: #eff6ff;
-    color: #1d4ed8;
-}
 
-.delete-event-btn {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-.delete-event-btn:hover {
-    background: #fee2e2;
-}
 
 .registrations {
     margin-top: 1rem;
@@ -1278,17 +1259,10 @@ body {
     min-width: 120px;
 }
 
-.edit-event-btn {
-    background: #2563eb;
+.edit-event-btn:hover{
+    background: #d29300;
 }
 
-.view-registrations-btn {
-    background: #555;
-}
-
-.delete-event-btn {
-    background: #dc2626;
-}
 
 .external-registration-status {
     color: #2563eb;
@@ -1366,7 +1340,111 @@ body {
 
 .dashboard-stat:hover .stat-link {
     color: #1d4ed8;
+}/* ================================
+   ADMIN REGISTRATIONS
+================================ */
+
+#admin-registration-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
+
+.registration-event-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 6px;
+}
+
+.registration-count {
+    flex-shrink: 0;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    background: #eef2ff;
+    color: #596b9c;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+/* Individual event card */
+
+.admin-registration-event {
+    background: #ffffff;
+    border: 1px solid #dfe3eb;
+    border-radius: 14px;
+    padding: 20px 22px;
+    transition: box-shadow 0.2s ease,
+                transform 0.2s ease;
+}
+
+.admin-registration-event:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+}
+
+
+/* Event title + registration count */
+
+.admin-registration-event h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #252525;
+}
+
+
+/* Registration count */
+
+.admin-registration-event > div > p:first-child {
+    margin: 5px 0 14px;
+    color: #64708a;
+    font-size: 14px;
+}
+
+
+/* Student row */
+
+.admin-registration {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 13px 0;
+
+    border-top: 1px solid #edf0f5;
+}
+
+
+/* Student name */
+
+.admin-registration strong {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2b2b2b;
+}
+
+
+/* Student email */
+
+.admin-registration span {
+    font-size: 14px;
+    color: #64708a;
+}
+
+
+/* Empty registrations */
+
+.admin-registration-students > p {
+    margin: 8px 0 0;
+    color: #7b8497;
+    font-size: 14px;
+}
+
 
 @media (max-width: 700px) {
 
@@ -1405,12 +1483,6 @@ body {
         width: 100%;
     }
 
-}
-/* =========================
-   Responsive Header
-   ========================= */
-
-@media (max-width: 600px) {
     .header-top {
         flex-direction: column;
         align-items: flex-start;
@@ -1427,4 +1499,26 @@ body {
     .admin-actions button {
         width: 100%;
     }
+    .admin-registration-event {
+        padding: 17px;
+    }
+
+    .admin-registration {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .admin-registration span {
+        font-size: 13px;
+        word-break: break-word;
+    }
+    .registration-event-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+
+
 }
