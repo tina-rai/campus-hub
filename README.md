@@ -26,7 +26,7 @@ https://github.com/tina-rai/campus-hub
 
 ![Manage Events](./screenshots/event-management.png)
 
-![Registrations](./screenshots/view-registrations.png)
+![Registrations](./screenshots/view-registration-admin.png)
 
 
 
@@ -130,7 +130,7 @@ campus-hub/
 │   ├── event-management.png
 │   ├── user-management.png
 │   ├── admin-dashboard.png
-│
+│   ├── view-registration-admin.png
 ├── server.js
 ├── package.json
 ├── package-lock.json
