@@ -220,7 +220,7 @@ Stores registration information associated with users and events.
 ```bash
 git clone https://github.com/tina-rai/campus-hub.git
 cd campus-hub
-
+```
 ### 2. Install dependencies
 npm install
 
